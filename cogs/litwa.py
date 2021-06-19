@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 class Litwa(commands.Cog):
-    """ Cog wrapping litwa commands for the bros. """
+    """Cog wrapping litwa commands for the bros."""
     def __init__(self, bot):
         self.bot = bot
 

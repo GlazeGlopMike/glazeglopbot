@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 
 class Moderator(commands.Cog):
-    """ Cog wrapping administrative commands. """
+    """Cog wrapping administrative commands."""
     def __init__(self, bot):
         self.bot = bot
 
@@ -27,7 +27,6 @@ class Moderator(commands.Cog):
         return msg
     
     @commands.command(aliases=['dc'])
-    # @commands.has_permissions(move_members=True)
     async def disconnect(self, ctx):
         """
         Disconnects users from their voice channels by moving them to a
