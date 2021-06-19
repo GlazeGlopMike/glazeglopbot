@@ -34,6 +34,20 @@ async def restart(ctx, *, cog):
         await ctx.message.add_reaction('\U0001F615');
         await ctx.send("Unrecognized cog.")
 
+@bot.command(name='reloadall')
+async def reload_all(ctx):
+    """Reloads all DIscord cogs in the directory."""
+
+    for path, subdirs, files in os.walk('cogs'):
+        for file in files:
+            if file[-3:] == '.py':
+                try:
+                    bot.reload_extension('cogs.' + file[:-3])
+                except (AttributeError, ImportError, commands.ExtensionError):
+                    print(f"Failed to load extentsion '{file[:-3]}'.")
+    
+    await ctx.send(f"Reloaded cogs.")
+
 @bot.command()
 async def unload(ctx, *, cog):
     """Unloads a Discord cog."""
@@ -78,7 +92,7 @@ for path, subdirs, files in os.walk('cogs'):
         if file[-3:] == '.py':
             try:
                 bot.load_extension('cogs.' + file[:-3])
-            except (AttributeError, ImportError):
+            except (AttributeError, ImportError, commands.ExtensionError):
                 print(f"Failed to load extentsion '{ext}'.")
 
 # start bot
