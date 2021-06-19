@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands
 
-class Admin(commands.Cog):
+class Moderator(commands.Cog):
     """ Cog wrapping administrative commands. """
     def __init__(self, bot):
         self.bot = bot
@@ -41,7 +41,7 @@ class Admin(commands.Cog):
         # verify permissions
         if not ctx.author.guild_permissions.move_members:
             await ctx.message.add_reaction('\U0001F44E');
-            ctx.send("You lack this authority!")
+            await ctx.send("You lack this authority!")
             return
         
         mentions = ctx.message.mentions
@@ -75,5 +75,48 @@ class Admin(commands.Cog):
         
         await temp_channel.delete()
 
+    @commands.command()
+    async def summon(self, ctx):
+        """
+        Moves users to author's voice channel
+
+        Requires Move Members permission.
+        """
+        # verify permissions
+        if not ctx.author.guild_permissions.move_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+        
+        mentions = ctx.message.mentions
+        voice = ctx.author.voice
+
+        if not (voice and voice.channel):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("You were not in a voice channel.")
+            return
+        
+        if mentions:
+            skipped = []
+            
+            for user in mentions:
+                try:
+                    await user.move_to(voice.channel)
+                except discord.errors.HTTPException:
+                    skipped.append(user)
+
+            if not skipped:
+                await ctx.send("All user(s) successfully moved.")
+            elif len(skipped) == len(mentions):
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("No users were moved.")
+            else:
+                await ctx.message.add_reaction('\u26A0');
+                await ctx.send(f"Some user(s) successfully moved. "
+                               f"{self.skipped_msg(ctx, skipped)}")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No users specified.")
+
 def setup(bot):
-    bot.add_cog(Admin(bot))
+    bot.add_cog(Moderator(bot))

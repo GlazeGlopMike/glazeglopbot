@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix='$')
 async def load(ctx, *, cog):
     """Loads a Discord cog."""
     try:
-        bot.load_extension(cog)
+        bot.load_extension('cogs.' + cog)
         await ctx.send(f"Loaded cog '{cog}'.")
     except commands.ExtensionError:
         if "already" in str(e):
@@ -28,7 +28,7 @@ async def load(ctx, *, cog):
 async def restart(ctx, *, cog):
     """Reloads a DIscord cog."""
     try:
-        bot.reload_extension(cog)
+        bot.reload_extension('cogs.' + cog)
         await ctx.send(f"Reloaded cog '{cog}'.")
     except commands.ExtensionError:
         await ctx.message.add_reaction('\U0001F615');
@@ -38,7 +38,7 @@ async def restart(ctx, *, cog):
 async def unload(ctx, *, cog):
     """Unloads a Discord cog."""
     try:
-        bot.unload_extension(cog)
+        bot.unload_extension('cogs.' + cog)
         await ctx.send(f"Unloaded cog '{cog}'.")
     except commands.ExtensionError:
         await ctx.message.add_reaction('\U0001F615');
