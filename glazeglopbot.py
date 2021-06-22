@@ -96,6 +96,9 @@ for path, subdirs, files in os.walk('cogs'):
                 print(f"Failed to load extentsion '{ext}'.")
 
 # start bot
-bot.run(token)
+try:
+    bot.run(token)
+except AttributeError:
+    print("Launch failed: Couldn't find the Discord token.")
 
 
