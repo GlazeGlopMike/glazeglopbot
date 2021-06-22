@@ -18,7 +18,7 @@ async def load(ctx, *, cog):
         bot.load_extension('cogs.' + cog)
         await ctx.send(f"Loaded cog '{cog}'.")
     except commands.ExtensionError:
-        if "already" in str(e):
+        if "already" in str(e): # restart if cog already loaded
             await restart(ctx, cog=cog)
         else:
             await ctx.message.add_reaction('\U0001F615');
@@ -100,5 +100,4 @@ try:
     bot.run(token)
 except AttributeError:
     print("Launch failed: Couldn't find the Discord token.")
-
 
