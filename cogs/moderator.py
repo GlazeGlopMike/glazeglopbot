@@ -41,7 +41,7 @@ class Moderator(commands.Cog):
             return
         
         mentions = ctx.message.mentions
-        temp_channel = await ctx.guild.create_voice_channel('BLACKOUT')
+        temp_channel = await ctx.guild.create_voice_channel('TEMP')
         
         if mentions:
             skipped = []
@@ -71,7 +71,7 @@ class Moderator(commands.Cog):
                                f"{self.skipped_msg(ctx, skipped)}")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users specified.")
+            await ctx.send(f"No users mentioned.")
 
         await temp_channel.delete()
     
@@ -91,7 +91,7 @@ class Moderator(commands.Cog):
             return
         
         mentions = ctx.message.mentions
-        temp_channel = await ctx.guild.create_voice_channel('KICK')
+        temp_channel = await ctx.guild.create_voice_channel('TEMP')
         
         if mentions:
             skipped = []
@@ -120,6 +120,43 @@ class Moderator(commands.Cog):
                 await ctx.send("You were not in a voice channel.")
         
         await temp_channel.delete()
+
+    @commands.command()
+    async def kick(self, ctx):
+        """
+        Kicks users from the guild.
+
+        Requires Kick Users permission.
+        """
+        # verify permissions
+        if not ctx.author.guild_permissions.kick_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            skipped = []
+            
+            for user in mentions:
+                try:
+                    await user.kick()
+                except discord.errors.HTTPException:
+                    skipped.append(user)
+
+            if not skipped:
+                await ctx.send("All user(s) successfully kicked.")
+            elif len(skipped) == len(mentions):
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("No users were kicked.")
+            else:
+                await ctx.message.add_reaction('\u26A0');
+                await ctx.send(f"Some user(s) successfully kicked. "
+                               f"{self.skipped_msg(ctx, skipped)}")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No users mentioned.")
 
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
@@ -162,7 +199,7 @@ class Moderator(commands.Cog):
                                f"{self.skipped_msg(ctx, skipped)}")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users specified.")
+            await ctx.send(f"No users mentioned.")
 
 def setup(bot):
     bot.add_cog(Moderator(bot))
