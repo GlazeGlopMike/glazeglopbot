@@ -76,10 +76,11 @@ class Weather(commands.Cog):
 
         # find location from search string using Bing Maps
         geocoder = geopy.geocoders.Bing(os.getenv('BING_MAPS_TOKEN'))
-        loc = geocoder.geocode(city, exactly_one=True, culture='en')
+        l = geocoder.geocode(city, exactly_one=True, culture='en')
         
         # return weather data and location
-        return mgr.one_call(loc.latitude, loc.longitude, exclude=exclude), loc
+        return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
+        
     
     def weather_emoji(self, w):
         """
@@ -127,6 +128,10 @@ class Weather(commands.Cog):
         except AttributeError:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't find weather for that location.")
+        except pyowm.commons.exceptions.UnauthorizedError:
+            await ctx.message.add_reaction('\U0001F916');
+            await ctx.send("Couldn't perform the API call.")
+            print("Search failed: Couldn't find OWM token.")
         
         w = obs.current
         
@@ -157,10 +162,10 @@ class Weather(commands.Cog):
         await ctx.send(f">>> {loc_str} | {temp}°C {status_emoji}\n"
                         f"Feels like: {feels_like}°C | "
                         f"Humidity: {humidity}% | "
-                        f"Dew point: {dew_point}°C \n"
+                        f"Wind: {wind_speed} km/h {wind_dir}\n"
                         f"Clouds: {cloud_cover}% | UV: {uv} | "
                         f"Visibility: {visibility} km\n"
-                        f"Wind: {wind_speed} km/h {wind_dir} | "
+                        f"Dew point: {dew_point}°C | "
                         f"Pressure: {pressure} kPa\n"
                         f"Last updated: {time_str} "
                         f"({obs.timezone})")
