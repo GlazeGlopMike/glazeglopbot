@@ -46,7 +46,6 @@ class Litwa(commands.Cog):
         Insults tagged users, or the command author if none named.
         """
         tags = len(users)
-        
         if tags == 1:
             await ctx.send(f"{users[0].mention} is gaeree!")
         elif tags > 1:
@@ -56,8 +55,8 @@ class Litwa(commands.Cog):
     
     @bontibi.error
     @gaeree.error
-    async def err(self, ctx, err):
-        """ Handles unrecognized tags. """
+    async def tag_err(self, ctx, err):
+        """Handles unrecognized tags."""
         if isinstance(err, commands.errors.MemberNotFound):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't find some of those users.")
