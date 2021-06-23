@@ -61,5 +61,10 @@ class Litwa(commands.Cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't find some of those users.")
 
+    @commands.command()
+    async def ree(self, ctx):
+        """Sends a 'REE' text-to-speech message."""
+        await ctx.send('REE-EEE-EEE-EEE-EEE-EEE!', tts=True)
+
 def setup(bot):
     bot.add_cog(Litwa(bot))
