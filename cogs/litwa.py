@@ -33,11 +33,11 @@ class Litwa(commands.Cog):
         """
         tags = len(users)
         if len(users) == 1:
-            await ctx.send(f"Bontibi, {users[0].mention}")
+            await ctx.send(f"Bontibi, {users[0].mention}!")
         elif tags > 1:
             await ctx.send(f"Bonivobis, {self.user_chain(users)}!")
         else:
-            await ctx.send(f"Bontibi, {ctx.author.mention}")
+            await ctx.send(f"Bontibi, {ctx.author.mention}!")
     
     @commands.command()
     async def gaeree(self, ctx, *users: discord.Member):
