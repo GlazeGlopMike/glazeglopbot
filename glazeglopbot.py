@@ -26,13 +26,17 @@ async def load(ctx, *, cog):
 
 @bot.command(name='reload', aliases=['rld'])
 async def restart(ctx, *, cog):
-    """Reloads a DIscord cog."""
-    try:
-        bot.reload_extension('cogs.' + cog)
-        await ctx.send(f"Reloaded cog '{cog}'.")
-    except commands.ExtensionError:
-        await ctx.message.add_reaction('\U0001F615');
-        await ctx.send("Unrecognized cog.")
+    """Reloads a Discord cog."""
+
+    if '-all' in ctx.message.content.split():
+        await reload_all(ctx)
+    else:
+        try:
+            bot.reload_extension('cogs.' + cog)
+            await ctx.send(f"Reloaded cog '{cog}'.")
+        except commands.ExtensionError:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reloadall',aliases=['rldall'])
 async def reload_all(ctx):
@@ -44,7 +48,7 @@ async def reload_all(ctx):
                 try:
                     bot.reload_extension('cogs.' + file[:-3])
                 except (AttributeError, ImportError, commands.ExtensionError):
-                    print(f"Failed to load extentsion '{file[:-3]}'.")
+                    print(f"Failed to reload extentsion '{file[:-3]}'.")
     
     await ctx.send(f"Reloaded cogs.")
 
