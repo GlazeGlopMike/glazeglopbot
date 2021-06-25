@@ -48,6 +48,11 @@ async def reload_all(ctx):
     
     await ctx.send(f"Reloaded cogs.")
 
+@bot.command(name='reloadenv',aliases=['rldenv'])
+async def reload_env(ctx):
+    """Reloads tokens."""
+    dotenv.load_dotenv()
+
 @bot.command(aliases=['uld'])
 async def unload(ctx, *, cog):
     """Unloads a Discord cog."""
