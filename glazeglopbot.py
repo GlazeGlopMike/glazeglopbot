@@ -11,7 +11,7 @@ dotenv.load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='$')
 
-@bot.command()
+@bot.command(aliases=['ld'])
 async def load(ctx, *, cog):
     """Loads a Discord cog."""
     try:
@@ -24,7 +24,7 @@ async def load(ctx, *, cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized cog.")
 
-@bot.command(name='reload')
+@bot.command(name='reload', aliases=['rld'])
 async def restart(ctx, *, cog):
     """Reloads a DIscord cog."""
     try:
@@ -34,7 +34,7 @@ async def restart(ctx, *, cog):
         await ctx.message.add_reaction('\U0001F615');
         await ctx.send("Unrecognized cog.")
 
-@bot.command(name='reloadall')
+@bot.command(name='reloadall',aliases=['rldall'])
 async def reload_all(ctx):
     """Reloads all DIscord cogs in the directory."""
 
@@ -48,7 +48,7 @@ async def reload_all(ctx):
     
     await ctx.send(f"Reloaded cogs.")
 
-@bot.command()
+@bot.command(aliases=['uld'])
 async def unload(ctx, *, cog):
     """Unloads a Discord cog."""
     try:
