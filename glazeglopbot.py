@@ -80,11 +80,8 @@ async def on_message(message):
     """Triggered when message sent in active channels."""
 
     # ignore messages from self and bots
-    if message.author == bot.user or message.author.bot:
-        return
-
-    # allows commands to be processed
-    await bot.process_commands(message)
+    if not message.author == bot.user or message.author.bot:
+        await bot.process_commands(message)
 
 # load all cogs in the directory
 for path, subdirs, files in os.walk('cogs'):
