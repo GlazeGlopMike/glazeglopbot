@@ -34,7 +34,6 @@ class Moderator(commands.Cog):
 
         Requires Move Members permission.
         """
-        # verify permissions
         if not ctx.author.guild_permissions.move_members:
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
@@ -65,13 +64,13 @@ class Moderator(commands.Cog):
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No video streams were stopped.")
-            elif len(ctx.message.content.split()) > 1:
-                await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"Unrecognized user(s).")
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send(f"Some video stream(s) successfully moved. "
                                f"{self.skipped_msg(ctx, skipped)}")
+        elif len(ctx.message.content.split()) > 1:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No users mentioned.")
@@ -86,8 +85,6 @@ class Moderator(commands.Cog):
 
         Requires Move Members permission.
         """
-
-        # verify permissions
         if not ctx.author.guild_permissions.move_members:
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
@@ -110,13 +107,13 @@ class Moderator(commands.Cog):
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were disconnected.")
-            elif len(ctx.message.content.split()) > 1:
-                await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"Unrecognized user(s).")
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send(f"Some user(s) successfully disconnected. "
                                f"{self.skipped_msg(ctx, skipped)}")
+        elif len(ctx.message.content.split()) > 1:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"Unrecognized user mention(s).")
         else:
             try:
                 await ctx.author.move_to(temp_channel)
@@ -134,7 +131,6 @@ class Moderator(commands.Cog):
 
         Requires Kick Users permission.
         """
-        # verify permissions
         if not ctx.author.guild_permissions.kick_members:
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
@@ -162,7 +158,7 @@ class Moderator(commands.Cog):
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Unrecognized user(s).")
+            await ctx.send(f"Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No users mentioned.")
@@ -174,7 +170,6 @@ class Moderator(commands.Cog):
 
         Requires Move Members permission.
         """
-        # verify permissions
         if not ctx.author.guild_permissions.move_members:
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
@@ -202,13 +197,13 @@ class Moderator(commands.Cog):
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were moved.")
-            elif len(ctx.message.content.split()) > 1:
-                await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"Unrecognized user(s).")
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send(f"Some user(s) successfully moved. "
                                f"{self.skipped_msg(ctx, skipped)}")
+        elif len(ctx.message.content.split()) > 1:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No users mentioned.")

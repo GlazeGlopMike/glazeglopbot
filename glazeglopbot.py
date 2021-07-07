@@ -38,7 +38,7 @@ async def restart(ctx, *, cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized cog.")
 
-@bot.command(name='reloadall',aliases=['rldall'])
+@bot.command(name='reloadall', aliases=['rldall'])
 async def reload_all(ctx):
     """Reloads all DIscord cogs in the directory."""
 
@@ -52,7 +52,7 @@ async def reload_all(ctx):
     
     await ctx.send(f"Reloaded cogs.")
 
-@bot.command(name='reloadenv',aliases=['rldenv'])
+@bot.command(name='reloadenv', aliases=['rldenv'])
 async def reload_env(ctx):
     """Reloads tokens."""
     dotenv.load_dotenv()
@@ -73,8 +73,8 @@ async def unload(ctx, *, cog):
 async def load_err(ctx, err):
     """Handles missing arguments by sending an error message."""
     if isinstance(err, commands.errors.MissingRequiredArgument):
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Module name required.")
+        await ctx.message.add_reaction('\U0001F615');
+        await ctx.send(f"Module name required.")
 
 @bot.event
 async def on_ready():

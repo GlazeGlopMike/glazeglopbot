@@ -31,13 +31,24 @@ class Litwa(commands.Cog):
         Accepts a list of Discord Member objects.
         Greets tagged users, or the command author if none named.
         """
-        tags = len(users)
-        if len(users) == 1:
-            await ctx.send(f"Bontibi, {users[0].mention}!")
-        elif tags > 1:
-            await ctx.send(f"Bonivobis, {self.user_chain(users)}!")
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            tags = len(users)
+            
+            if tags == 1:
+                await ctx.send(f"Bontibi, {users[0].mention}!")
+            elif tags > 1:
+                await ctx.send(f"Bonivobis, {self.user_chain(users)}!")
+            
+            else:
+                await ctx.send(f"Bontibi, {ctx.author.mention}!")
+        elif len(ctx.message.content.split()) > 1:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"Unrecognized user(s).")
         else:
-            await ctx.send(f"Bontibi, {ctx.author.mention}!")
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No users mentioned.")
     
     @commands.command()
     async def gaeree(self, ctx, *users: discord.Member):
@@ -45,13 +56,23 @@ class Litwa(commands.Cog):
         Accepts a list of Discord Member objects.
         Insults tagged users, or the command author if none named.
         """
-        tags = len(users)
-        if tags == 1:
-            await ctx.send(f"{users[0].mention} is gaeree!")
-        elif tags > 1:
-            await ctx.send(f"{self.user_chain(users)} are gaeree!")
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            tags = len(users)
+            
+            if tags == 1:
+                await ctx.send(f"{users[0].mention} is gaeree!")
+            elif tags > 1:
+                await ctx.send(f"{self.user_chain(users)} are gaeree!")
+            else:
+                await ctx.send(f"{ctx.author.mention} is gaeree!")
+        elif len(ctx.message.content.split()) > 1:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Unrecognized user(s).")
         else:
-            await ctx.send(f"{ctx.author.mention} is gaeree!")
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No users mentioned.")
     
     @bontibi.error
     @gaeree.error
