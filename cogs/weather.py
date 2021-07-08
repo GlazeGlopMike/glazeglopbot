@@ -189,7 +189,7 @@ class Weather(commands.Cog):
         Default location is Toronto, ON and default forecast period is 12h.
         """
         if args:
-            if args[0] == '-12h':
+            if args[0] == '-12h' or args[0] == '-hourly':
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
@@ -216,12 +216,50 @@ class Weather(commands.Cog):
                     time_str = time.strftime('%-I %p')
 
                     # cursory details
-                    temp = int(round(f.temperature('celsius')['temp']))
+                    temp = int(round(f.temperature('celsius')['temp'])) # °C
                     status_emoji = self.weather_emoji(f)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
                     
                     f_list.append(f"{time_str} | {temp}°C {status_emoji} | "
                                   f"POP: {pop}%")
+
+                f_str = '\n'.join(f_list)
+                await ctx.send(f">>> {loc_str}\n{f_str}")
+            elif args[0] == '-7d' or args[0] == '-daily':
+                # get observation and location information
+                try:
+                    place = ' '.join(args[1:])
+                    obs, loc = self.get_obs(place, 'minutely,hourly')
+                except (AttributeError, geopy.exc.GeocoderQueryError) as e:
+                    await ctx.message.add_reaction('\U0001F615');
+                    await ctx.send(f"Couldn't get a forecast for that "
+                                   "location.")
+                except pyowm.commons.exceptions.UnauthorizedError:
+                    await ctx.message.add_reaction('\U0001F916');
+                    await ctx.send("Couldn't perform the API call.")
+                    print("Search failed: Couldn't find OWM token.")
+
+                forecasts = obs.forecast_daily
+                f_list = []
+
+                # location details
+                loc_str = loc.raw['address']['formattedAddress']
+
+                for f in forecasts:
+                    # time details
+                    tz = pytz.timezone(obs.timezone)
+                    time = datetime.fromtimestamp(int(f.reference_time()), tz)
+                    time_str = time.strftime('%a %-d')
+
+                    # cursory details
+                    t = f.temperature('celsius')
+                    day_temp = int(round(t['day'])) # °C
+                    night_temp = int(round(t['night'])) # °C
+                    status_emoji = self.weather_emoji(f)
+                    pop = int(round(f.precipitation_probability * 100)) # -> %
+                    
+                    f_list.append(f"{time_str} | {day_temp}°C {status_emoji} | "
+                                  f"Night: {night_temp}°C | POP: {pop}%")
 
                 f_str = '\n'.join(f_list)
 
