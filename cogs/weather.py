@@ -1,7 +1,7 @@
 # weather.py
-import datetime
 import os
 
+from datetime import datetime
 from discord.ext import commands
 import dotenv
 import geopy, geopy.geocoders
@@ -58,10 +58,12 @@ class Weather(commands.Cog):
         elif angle < 348.75:
             return 'NNW'
     
-    def get_obs(self, city, exclude = ''):
+    def get_obs(self, place='', exclude = ''):
         """
         Accepts a place string and any parts of the One Call data to ignore.
         Returns a tuple with a PyOWM OneCall object and geopy Location object.
+
+        Default place is Toronto, ON.
 
         Observation taken using OWM One Call API.
         https://openweathermap.org/api/one-call-api
@@ -74,9 +76,13 @@ class Weather(commands.Cog):
         owm = pyowm.OWM(os.getenv('OWM_TOKEN'))
         mgr = owm.weather_manager()
 
+        # default place is Toronto, ON
+        if place.strip() == '':
+            place = 'Toronto, ON'
+
         # find location from search string using Bing Maps
         geocoder = geopy.geocoders.Bing(os.getenv('BING_MAPS_TOKEN'))
-        l = geocoder.geocode(city, exactly_one=True, culture='en')
+        l = geocoder.geocode(place, exactly_one=True, culture='en')
         
         # return weather data and location
         return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
@@ -112,22 +118,19 @@ class Weather(commands.Cog):
             raise ValueError("Unrecognized weather ID.")
     
     @commands.command()
-    async def weather(self, ctx, *, place='Toronto, ON'):
+    async def weather(self, ctx, *, place=''):
         """
         Sends a weather report message using OpenWeatherMap data for
         chosen city.
                 
         Default location is Toronto, ON.
         """
-
         # get observation and location information
-        obs, loc = None, None
-        
         try:
             obs, loc = self.get_obs(place, 'minutely,hourly,daily')
-        except AttributeError:
+        except (AttributeError, geopy.exc.GeocoderQueryError) as e:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Couldn't find weather for that location.")
+            await ctx.send(f"Couldn't get weather for that location.")
         except pyowm.commons.exceptions.UnauthorizedError:
             await ctx.message.add_reaction('\U0001F916');
             await ctx.send("Couldn't perform the API call.")
@@ -140,7 +143,7 @@ class Weather(commands.Cog):
 
         # time details
         tz = pytz.timezone(obs.timezone)
-        time = datetime.datetime.fromtimestamp(int(w.reference_time()), tz)
+        time = datetime.fromtimestamp(int(w.reference_time()), tz)
         time_str = time.strftime('%Y-%m-%d %I:%M %p')
 
         # cursory details
@@ -160,8 +163,8 @@ class Weather(commands.Cog):
         wind_dir = self.compass_dir(w.wind()['deg']) # °
 
         # sun details
-        sunrise = datetime.datetime.fromtimestamp(int(w.sunrise_time()), tz)
-        sunset = datetime.datetime.fromtimestamp(int(w.sunset_time()), tz)
+        sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
+        sunset = datetime.fromtimestamp(int(w.sunset_time()), tz)
         sunrise_str = sunrise.strftime('%I:%M %p')
         sunset_str = sunset.strftime('%I:%M %p')
         
@@ -178,14 +181,53 @@ class Weather(commands.Cog):
                         f"({obs.timezone})")
 
     @commands.command()
-    async def forecast(self, ctx, *, place="Toronto, ON"):
+    async def forecast(self, ctx, *args):
         """
         Sends a weather forecast message using OpenWeatherMap data for
         chosen city and time frame.
                 
         Default location is Toronto, ON.
         """
-        pass
+        if args:
+            if '-12h' in args[0]:
+                # get observation and location information
+                try:
+                    place = ' '.join(args[1:])
+                    obs, loc = self.get_obs(place, 'minutely,daily')
+                except (AttributeError, geopy.exc.GeocoderQueryError) as e:
+                    await ctx.message.add_reaction('\U0001F615');
+                    await ctx.send(f"Couldn't get a forecast for that "
+                                   "location.")
+                except pyowm.commons.exceptions.UnauthorizedError:
+                    await ctx.message.add_reaction('\U0001F916');
+                    await ctx.send("Couldn't perform the API call.")
+                    print("Search failed: Couldn't find OWM token.")
+
+                forecasts = obs.forecast_hourly[:13]
+                f_list = []
+
+                # location details
+                loc_str = loc.raw['address']['formattedAddress']
+
+                for f in forecasts:
+                    # time details
+                    tz = pytz.timezone(obs.timezone)
+                    time = datetime.fromtimestamp(int(f.reference_time()), tz)
+                    time_str = time.strftime('%-I %p')
+
+                    # cursory details
+                    temp = int(round(f.temperature('celsius')['temp']))
+                    status_emoji = self.weather_emoji(f)
+                    
+                    f_list.append(f"{time_str} | {temp}°C {status_emoji}")
+
+                f_str = '\n'.join(f_list)
+
+                await ctx.send(f">>> {loc_str}\n{f_str}")
+            else:
+                await self.forecast(ctx, ' '.join(args))
+        else:
+            await self.forecast(ctx, '-12h')
 
 def setup(bot):
     bot.add_cog(Weather(bot))
