@@ -218,8 +218,10 @@ class Weather(commands.Cog):
                     # cursory details
                     temp = int(round(f.temperature('celsius')['temp']))
                     status_emoji = self.weather_emoji(f)
+                    pop = int(round(f.precipitation_probability * 100)) # -> %
                     
-                    f_list.append(f"{time_str} | {temp}°C {status_emoji}")
+                    f_list.append(f"{time_str} | {temp}°C {status_emoji} | "
+                                  f"POP: {pop}%")
 
                 f_str = '\n'.join(f_list)
 
