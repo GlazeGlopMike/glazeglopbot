@@ -21,6 +21,7 @@ You can set up your own version of GlazeGlopBot with your own API tokens.
 
 3. Get your tokens as appropriate.
 - [Discord Developer Portal](https://discord.com/developers)
+
 The weather cog also requires:
 - [Bing Maps Dev Center](https://www.bingmapsportal.com/)
 - [OpenWeatherMap](https://openweathermap.org/api)
@@ -43,7 +44,7 @@ e.g. ```$bontibi``` to request a greeting.
 The bot loads all the cogs (```.py``` files) in the ```cogs``` directory on startup. Individual cogs can be reloaded, unloaded, and loaded with ```$rld```, ```$uld```, and ```$ld``` respectively. To reload all of the cogs, use ```$rldall```. The reloading commands allow updates to the cogs to be applied without restarting the bot.
 
 
-## Possible Additions
+## Planned Future Additions
 - Weather forecasts
 - Stock summaries
 - Music player
