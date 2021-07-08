@@ -27,7 +27,7 @@ async def load(ctx, *, cog):
 async def restart(ctx, *, cog):
     """Reloads a Discord cog."""
 
-    if '-all' in ctx.message.content.split():
+    if cog == '-all':
         await reload_all(ctx)
     else:
         try:
@@ -99,7 +99,6 @@ for path, subdirs, files in os.walk('cogs'):
             except (AttributeError, ImportError, commands.ExtensionError):
                 print(f"Failed to load extension '{ext}'.")
 
-# start bot
 try:
     bot.run(token)
 except AttributeError:

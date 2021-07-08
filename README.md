@@ -43,8 +43,8 @@ e.g. ```$bontibi``` to request a greeting.
 All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
 - ```$ld [cog]``` to load a cog
 - ```$rld [cog]``` to reload a cog
+- ```$rldall``` to reload all cogs
 - ```$uld [cog]``` to unload a cog
-The ```-all``` flag applies the command to all cogs.
 
 Updates to ```.env``` can be applied using ```$rldenv```.
 
