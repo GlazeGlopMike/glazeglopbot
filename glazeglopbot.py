@@ -1,5 +1,4 @@
 # glazeglopbot.py
-import datetime
 import os
 
 import discord
@@ -48,7 +47,7 @@ async def reload_all(ctx):
                 try:
                     bot.reload_extension('cogs.' + file[:-3])
                 except (AttributeError, ImportError, commands.ExtensionError):
-                    print(f"Failed to reload extentsion '{file[:-3]}'.")
+                    print(f"Failed to reload extension '{file[:-3]}'.")
     
     await ctx.send(f"Reloaded cogs.")
 
@@ -98,7 +97,7 @@ for path, subdirs, files in os.walk('cogs'):
             try:
                 bot.load_extension('cogs.' + file[:-3])
             except (AttributeError, ImportError, commands.ExtensionError):
-                print(f"Failed to load extentsion '{ext}'.")
+                print(f"Failed to load extension '{ext}'.")
 
 # start bot
 try:
