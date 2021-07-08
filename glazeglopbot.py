@@ -91,7 +91,7 @@ async def on_message(message):
     if not message.author == bot.user or message.author.bot:
         await bot.process_commands(message)
 
-# load all cogs in the directory
+# load all cogs in the directory on startup
 for path, subdirs, files in os.walk('cogs'):
     for file in files:
         if file[-3:] == '.py':
