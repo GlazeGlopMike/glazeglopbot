@@ -158,6 +158,12 @@ class Weather(commands.Cog):
         visibility = round(w.visibility_distance / 1000, 1) # m -> km
         wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
         wind_dir = self.compass_dir(w.wind()['deg']) # °
+
+        # sun details
+        sunrise = datetime.datetime.fromtimestamp(int(w.sunrise_time()), tz)
+        sunset = datetime.datetime.fromtimestamp(int(w.sunset_time()), tz)
+        sunrise_str = sunrise.strftime('%I:%M %p')
+        sunset_str = sunset.strftime('%I:%M %p')
         
         await ctx.send(f">>> {loc_str} | {temp}°C {status_emoji}\n"
                         f"Feels like: {feels_like}°C | "
@@ -167,11 +173,18 @@ class Weather(commands.Cog):
                         f"Visibility: {visibility} km\n"
                         f"Dew point: {dew_point}°C | "
                         f"Pressure: {pressure} kPa\n"
-                        f"Last updated: {time_str} "
+                        f"Sunrise: {sunrise_str} | Sunset: {sunset_str}\n"
+                        f"Updated {time_str} "
                         f"({obs.timezone})")
 
     @commands.command()
     async def forecast(self, ctx, *, place="Toronto, ON"):
+        """
+        Sends a weather forecast message using OpenWeatherMap data for
+        chosen city and time frame.
+                
+        Default location is Toronto, ON.
+        """
         pass
 
 def setup(bot):

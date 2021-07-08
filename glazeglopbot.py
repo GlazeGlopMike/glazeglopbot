@@ -87,7 +87,6 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     """Triggered when message sent in active channels."""
-
     # ignore messages from self and bots
     if not message.author == bot.user or message.author.bot:
         await bot.process_commands(message)

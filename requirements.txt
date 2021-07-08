@@ -1,0 +1,5 @@
+discord.py
+geopy
+pyowm
+python-dotenv
+pytz
