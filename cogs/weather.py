@@ -186,10 +186,10 @@ class Weather(commands.Cog):
         Sends a weather forecast message using OpenWeatherMap data for
         chosen city and time frame.
                 
-        Default location is Toronto, ON.
+        Default location is Toronto, ON and default forecast period is 12h.
         """
         if args:
-            if '-12h' in args[0]:
+            if args[0] == '-12h':
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
@@ -224,8 +224,12 @@ class Weather(commands.Cog):
                 f_str = '\n'.join(f_list)
 
                 await ctx.send(f">>> {loc_str}\n{f_str}")
+            elif args[0] == '-current' or args[0] == '-now':
+                place = ' '.join(args[1:])
+                await self.weather(ctx, place=place)
             else:
-                await self.forecast(ctx, ' '.join(args))
+                args = ('-12h',) + args
+                await self.forecast(ctx, *args)
         else:
             await self.forecast(ctx, '-12h')
 
