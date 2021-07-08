@@ -10,6 +10,11 @@ Some common guild (server) moderation commands (e.g. moving users across voice c
 ### weather
 GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://openweathermap.org/). To make location input user-friendly, GlazeGlopBot uses the [Bing Maps API](https://www.bingmapsportal.com/) to resolve natural language inputs into geographic coordinates. The weather cog then makes a OneCall request to OWM, which returns information such as temperature, precipitation, air/wind conditions, and sunrise/sunset times.
 
+The weather cog can grab:
+- Current weather
+- 12-hour hourly forecast
+- 7-day daily forecast
+
 ## Setup
 You can set up your own version of GlazeGlopBot with your own API tokens.
 
