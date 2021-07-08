@@ -22,7 +22,7 @@ You can set up your own version of GlazeGlopBot with your own API tokens.
 3. Get your tokens as appropriate.
 - [Discord Developer Portal](https://discord.com/developers)
 
-The weather cog also requires:
+  The weather cog also requires:
 - [Bing Maps Dev Center](https://www.bingmapsportal.com/)
 - [OpenWeatherMap](https://openweathermap.org/api)
 
