@@ -35,14 +35,18 @@ OWM_TOKEN=[OpenWeatherMap token]
 
 5. Add the bot to your guild using the link assigned to it by Discord.
 
-
 ## Usage
 Within Discord guilds, the bot responds to commands prefixed with the ```$``` character (e.g. ```$ree```). Users can be passed as arguments by tagging them.
 
 e.g. ```$bontibi``` to request a greeting.
 
-The bot loads all the cogs (```.py``` files) in the ```cogs``` directory on startup. Individual cogs can be reloaded, unloaded, and loaded with ```$rld```, ```$uld```, and ```$ld``` respectively. To reload all of the cogs, use ```$rldall```. The reloading commands allow updates to the cogs to be applied without restarting the bot.
+All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
+- ```$ld [cog]``` to load a cog
+- ```$rld [cog]``` to reload a cog
+- ```$uld [cog]``` to unload a cog
+The ```-all``` flag applies the command to all cogs.
 
+Updates to ```.env``` can be applied using ```$rldenv```.
 
 ## Planned Future Additions
 - Weather forecasts
