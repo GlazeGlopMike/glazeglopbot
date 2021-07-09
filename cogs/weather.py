@@ -58,7 +58,7 @@ class Weather(commands.Cog):
         elif angle < 348.75:
             return 'NNW'
     
-    def get_obs(self, place='', exclude = ''):
+    def get_obs(self, place='', exclude=''):
         """
         Accepts a place string and any parts of the One Call data to ignore.
         Returns a tuple with a PyOWM OneCall object and geopy Location object.
@@ -117,7 +117,7 @@ class Weather(commands.Cog):
         else:
             raise ValueError("Unrecognized weather ID.")
     
-    @commands.command()
+    @commands.command(aliases=['wr'])
     async def weather(self, ctx, *, place=''):
         """
         Sends a weather report message using OpenWeatherMap data for
@@ -180,7 +180,7 @@ class Weather(commands.Cog):
                         f"Updated {time_str} "
                         f"({obs.timezone})")
 
-    @commands.command()
+    @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
         """
         Sends a weather forecast message using OpenWeatherMap data for
