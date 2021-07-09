@@ -26,6 +26,45 @@ class Moderator(commands.Cog):
             msg += f'and {members[-1].name}'
         return msg
 
+    @commands.command()
+    async def ban(self, ctx):
+        """
+        Ban users from the guild.
+
+        Requires Ban Users permission.
+        """
+        if not ctx.author.guild_permissions.ban_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            skipped = []
+            
+            for user in mentions:
+                try:
+                    await user.ban()
+                except discord.errors.HTTPException:
+                    skipped.append(user)
+
+            if not skipped:
+                await ctx.send("All user(s) successfully banned.")
+            elif len(skipped) == len(mentions):
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("No users were banned.")
+            else:
+                await ctx.message.add_reaction('\u26A0');
+                await ctx.send(f"Some user(s) successfully banned. "
+                               f"{self.skipped_msg(ctx, skipped)}")
+        elif len(ctx.message.content.split()) > 1:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Unrecognized user mention(s).")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No users mentioned.")
+    
     @commands.command(aliases=['bo', 'sv', 'stopvid', 'stopvideo'])
     async def blackout(self, ctx):
         """
