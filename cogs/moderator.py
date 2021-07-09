@@ -219,7 +219,7 @@ class Moderator(commands.Cog):
 
         if not (voice and voice.channel):
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("You were not in a voice channel.")
+            await ctx.send("You're not in a voice channel.")
             return
         
         if mentions:
