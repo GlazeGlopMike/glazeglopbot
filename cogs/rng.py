@@ -20,6 +20,7 @@ class RNG(commands.Cog):
 
     @roll.error
     async def rng_err(self, ctx, err):
+        """Handles non-integer arguments."""
         if isinstance(err, commands.errors.BadArgument):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Illegal bound.")
