@@ -54,6 +54,7 @@ All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on st
 Updates to ```.env``` can be applied using ```$rldenv```.
 
 ## Planned Future Additions
+- Built-in help commands
 - Stock summaries
 - Music player
 - Voice channel presence with text-to-speech
