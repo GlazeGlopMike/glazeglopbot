@@ -96,7 +96,7 @@ for path, subdirs, files in os.walk('cogs'):
         if file[-3:] == '.py':
             try:
                 bot.load_extension('cogs.' + file[:-3])
-            except (AttributeError, ImportError, commands.ExtensionError):
+            except Exception as e:
                 print(f"Failed to load extension '{ext}'.")
 
 try:
