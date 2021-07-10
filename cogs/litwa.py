@@ -23,7 +23,6 @@ class Litwa(commands.Cog):
             return f'{users_cs}and {users[-1].mention}'
         else:
             return ""
-        
     
     @commands.command()
     async def bontibi(self, ctx, *users: discord.Member):
@@ -81,6 +80,11 @@ class Litwa(commands.Cog):
         if isinstance(err, commands.errors.MemberNotFound):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't find some of those users.")
+
+    @commands.command()
+    async def bruhvy(self, ctx):
+        """Sends a 'Bruhvy' text-to-speech message."""
+        await ctx.send('Bruhvy.', tts=True)
 
     @commands.command()
     async def ree(self, ctx):
