@@ -62,6 +62,50 @@ class VC(commands.Cog):
             await ctx.send("Not in a voice channel.")
 
     @commands.command()
+    async def screech(self, ctx):
+        """
+        Plays the REE sound in the current voice channel.
+
+        Joins the author's voice channel if not already present.
+        Interrupts the current sound if necessary.
+        """
+        await self.sound(ctx)
+
+    @commands.command(aliases=['snd'])
+    async def sound(self, ctx, name='default'):
+        """
+        Plays a sound from the sounds directory in the current voice channel.
+
+        Joins the author's voice channel if not already present.
+        Interrupts the current sound if necessary.
+        Default sound is 'sounds/default.ogg'.
+        """
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+        
+        if not voice:
+            await self.join(ctx)
+        
+        ffmpeg_path = os.getenv('FFMPEG_PATH')
+        sound_path = f'sounds/{name}.ogg'
+
+        if not os.path.isfile(sound_path):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("Sound file not found.")
+            return
+        
+        audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
+                                       source=sound_path)
+        sound = discord.PCMVolumeTransformer(audio)
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+        if voice:
+            if voice.is_playing():
+                voice.stop()
+        
+        ctx.voice_client.play(sound)
+        await ctx.send(f"Playing '{name}.ogg.'")
+
+    @commands.command()
     async def stop(self, ctx):
         """Stops the currently playing sound."""
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
@@ -77,28 +121,5 @@ class VC(commands.Cog):
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a voice channel.")
 
-    @commands.command()
-    async def screech(self, ctx):
-        """
-        Plays the REE sound in the current voice channel.
-
-        Joins the author's voice channel if not already present.
-        Interrupts the current sound if necessary.
-        """
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
-        
-        if not voice:
-            await self.join(ctx)
-
-        ffmpeg_path = os.getenv('FFMPEG_PATH')
-        audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
-                                       source='sounds/ree.mp3')
-        sound = discord.PCMVolumeTransformer(audio)
-        
-        if voice.is_playing():
-            voice.stop()
-        
-        ctx.voice_client.play(sound)
-    
 def setup(bot):
     bot.add_cog(VC(bot))

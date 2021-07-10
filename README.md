@@ -50,15 +50,23 @@ FFMPEG_PATH=[FFmpeg path]
 6. Add the bot to your guild using the link assigned to it by Discord.
 
 ## Usage
+### Commands
 Within Discord guilds, the bot responds to commands prefixed with the ```$``` character (e.g. ```$ree```). Users can be passed as arguments by tagging them.
 
 e.g. ```$bontibi``` to request a greeting.
 
+### Cogs
 All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
 - ```$ld [cog]``` to load a cog
 - ```$rld [cog]``` to reload a cog
 - ```$rldall``` to reload all cogs
 - ```$uld [cog]``` to unload a cog
+
+You can add your own custom-written cogs to that folder and load them, as long as there are no cog or command naming conflicts.
+
+### Sound
+OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice channels using ```$sound [name]```. You can add your own too.
+
 
 Updates to ```.env``` can be applied using ```$rldenv```.
 
