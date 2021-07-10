@@ -31,11 +31,11 @@ You can set up your own version of GlazeGlopBot with your own API tokens.
 ```pip3 install -r requirements.txt```
 
 3. Get your tokens as appropriate.
-- [Discord Developer Portal](https://discord.com/developers)
+- Discord token: <https://discord.com/developers>
 
 The weather cog also requires:
-- [Bing Maps Dev Center](https://www.bingmapsportal.com/)
-- [OpenWeatherMap](https://openweathermap.org/api)
+- Bing Maps token: <https://www.bingmapsportal.com/>
+- OpenWeatherMap token: <https://openweathermap.org/api>
 
 4. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
 
@@ -73,5 +73,5 @@ Updates to ```.env``` can be applied using ```$rldenv```.
 ## Planned Future Additions
 - Built-in help commands
 - Stock summaries
-- Music player
+- Music streaming from YouTube, Spotify, etc.
 - Voice channel presence with text-to-speech
