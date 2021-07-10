@@ -69,7 +69,7 @@ class VC(commands.Cog):
         Joins the author's voice channel if not already present.
         Interrupts the current sound if necessary.
         """
-        await self.sound(ctx)
+        await self.sound(ctx, 'ree')
 
     @commands.command(aliases=['snd'])
     async def sound(self, ctx, name='default'):
