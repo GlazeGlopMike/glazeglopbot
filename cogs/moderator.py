@@ -202,6 +202,44 @@ class Moderator(commands.Cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No users mentioned.")
 
+    @commands.command(aliases=['nick'])
+    async def nickname(self, ctx, member:discord.Member, nick):
+        """
+        Changes a user's nickname.
+
+        Requires Change Nickname permission.
+        """
+        if not ctx.author.guild_permissions.change_nickname:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        try:
+            old_nick = member.nick
+            
+            if nick == old_nick:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"That's the same name.")
+            else:
+                await member.edit(nick=nick)
+                await ctx.send(f"Updated nickname for {member.mention}.")
+        except discord.errors.Forbidden:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"I don't have permission to do that.")
+
+    @nickname.error
+    async def nickname_err(self, ctx, err):
+        if isinstance(err, commands.errors.MemberNotFound):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Couldn't find that user.")
+        elif isinstance(err, commands.errors.MissingRequiredArgument):
+            if 'member' in str(err):
+                nick = ' '.join(ctx.message.content.split()[1:])
+                await self.nickname(ctx, ctx.author, nick)
+            else:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"No user mentioned.")
+
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
         """
