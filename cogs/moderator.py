@@ -50,7 +50,7 @@ class Moderator(commands.Cog):
                     skipped.append(user)
 
             if not skipped:
-                await ctx.send("All user(s) successfully banned.")
+                await ctx.send("All users successfully banned.")
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were banned.")
@@ -142,7 +142,7 @@ class Moderator(commands.Cog):
                     skipped.append(user)
 
             if not skipped:
-                await ctx.send("All user(s) successfully disconnected.")
+                await ctx.send("All users successfully disconnected.")
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were disconnected.")
@@ -187,7 +187,7 @@ class Moderator(commands.Cog):
                     skipped.append(user)
 
             if not skipped:
-                await ctx.send("All user(s) successfully kicked.")
+                await ctx.send("All users successfully kicked.")
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were kicked.")
@@ -274,7 +274,7 @@ class Moderator(commands.Cog):
                     skipped.append(user)
 
             if not skipped:
-                await ctx.send("All user(s) successfully moved.")
+                await ctx.send("All users successfully moved.")
             elif len(skipped) == len(mentions):
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No users were moved.")
