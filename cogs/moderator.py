@@ -56,14 +56,14 @@ class Moderator(commands.Cog):
                 await ctx.send("No users were banned.")
             else:
                 await ctx.message.add_reaction('\u26A0');
-                await ctx.send(f"Some user(s) successfully banned. "
+                await ctx.send("Some user(s) successfully banned. "
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Unrecognized user mention(s).")
+            await ctx.send("Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users mentioned.")
+            await ctx.send("No users mentioned.")
     
     @commands.command(aliases=['bo', 'sv', 'stopvid', 'stopvideo'])
     async def blackout(self, ctx):
@@ -105,14 +105,14 @@ class Moderator(commands.Cog):
                 await ctx.send("No video streams were stopped.")
             else:
                 await ctx.message.add_reaction('\u26A0');
-                await ctx.send(f"Some video stream(s) successfully moved. "
+                await ctx.send("Some video stream(s) successfully moved. "
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
                 await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"Unrecognized user mention(s).")
+                await ctx.send("Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users mentioned.")
+            await ctx.send("No users mentioned.")
 
         await temp_channel.delete()
     
@@ -148,11 +148,11 @@ class Moderator(commands.Cog):
                 await ctx.send("No users were disconnected.")
             else:
                 await ctx.message.add_reaction('\u26A0');
-                await ctx.send(f"Some user(s) successfully disconnected. "
+                await ctx.send("Some user(s) successfully disconnected. "
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
                 await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"Unrecognized user mention(s).")
+                await ctx.send("Unrecognized user mention(s).")
         else:
             try:
                 await ctx.author.move_to(temp_channel)
@@ -193,14 +193,14 @@ class Moderator(commands.Cog):
                 await ctx.send("No users were kicked.")
             else:
                 await ctx.message.add_reaction('\u26A0');
-                await ctx.send(f"Some user(s) successfully kicked. "
+                await ctx.send("Some user(s) successfully kicked. "
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Unrecognized user mention(s).")
+            await ctx.send("Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users mentioned.")
+            await ctx.send("No users mentioned.")
 
     @commands.command(aliases=['nick'])
     async def nickname(self, ctx, member:discord.Member, nick):
@@ -219,26 +219,30 @@ class Moderator(commands.Cog):
             
             if nick == old_nick:
                 await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"That's the same name.")
+                await ctx.send("That's the same name.")
             else:
                 await member.edit(nick=nick)
                 await ctx.send(f"Updated nickname for {member.mention}.")
         except discord.errors.Forbidden:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"I don't have permission to do that.")
+            await ctx.send("I don't have permission to do that.")
 
     @nickname.error
     async def nickname_err(self, ctx, err):
-        if isinstance(err, commands.errors.MemberNotFound):
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Couldn't find that user.")
-        elif isinstance(err, commands.errors.MissingRequiredArgument):
-            if 'member' in str(err):
-                nick = ' '.join(ctx.message.content.split()[1:])
-                await self.nickname(ctx, ctx.author, nick)
-            else:
+        if isinstance(err, commands.errors.MemberNotFound) or \
+        isinstance(err, commands.errors.MissingRequiredArgument):
+            nick_args = ctx.message.content.split()[1:]
+            print(err)
+            print(nick_args)
+            
+            if 'member' in str(err) and not nick_args:
                 await ctx.message.add_reaction('\U0001F615');
-                await ctx.send(f"No user mentioned.")
+                await ctx.send("No user mentioned.")
+            elif 'nick' in str(err):
+                await ctx.send("No new nickname provided.")
+            else:
+                await self.nickname(ctx, ctx.author, ' '.join(nick_args))
+                
 
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
@@ -276,14 +280,14 @@ class Moderator(commands.Cog):
                 await ctx.send("No users were moved.")
             else:
                 await ctx.message.add_reaction('\u26A0');
-                await ctx.send(f"Some user(s) successfully moved. "
+                await ctx.send("Some user(s) successfully moved. "
                                f"{self.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Unrecognized user mention(s).")
+            await ctx.send("Unrecognized user mention(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"No users mentioned.")
+            await ctx.send("No users mentioned.")
 
 def setup(bot):
     bot.add_cog(Moderator(bot))
