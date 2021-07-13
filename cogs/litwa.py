@@ -58,7 +58,7 @@ class Litwa(commands.Cog):
             
             if tags == 1:
                 await ctx.send(f"{mentions[0].mention} is gaeree!")
-            else tags > 1:
+            else:
                 await ctx.send(f"{self.user_chain(mentions)} are gaeree!")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
