@@ -116,69 +116,6 @@ class Weather(commands.Cog):
         # unrecognized code
         else:
             raise ValueError("Unrecognized weather ID.")
-    
-    @commands.command(aliases=['wr'])
-    async def weather(self, ctx, *, place=''):
-        """
-        Sends a weather report message using OpenWeatherMap data for
-        chosen city.
-                
-        Default location is Toronto, ON.
-        """
-        # get observation and location information
-        try:
-            obs, loc = self.get_obs(place, 'minutely,hourly,daily')
-        except (AttributeError, geopy.exc.GeocoderQueryError) as e:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Couldn't get weather for that location.")
-        except pyowm.commons.exceptions.UnauthorizedError:
-            await ctx.message.add_reaction('\U0001F916');
-            await ctx.send("Couldn't perform the API call.")
-            print("Search failed: Couldn't find OWM token.")
-        
-        w = obs.current
-        
-        # location details
-        loc_str = loc.raw['address']['formattedAddress']
-
-        # time details
-        tz = pytz.timezone(obs.timezone)
-        time = datetime.fromtimestamp(int(w.reference_time()), tz)
-        time_str = time.strftime('%Y-%m-%d %I:%M %p')
-
-        # cursory details
-        t = w.temperature('celsius') # °C
-        temp = int(round(t['temp'])) # °C
-        feels_like = int(round(t['feels_like'])) # °C
-        dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-        status_emoji = self.weather_emoji(w)
-
-        # other environmental details
-        humidity = w.humidity # %
-        cloud_cover = w.clouds # %
-        uv = round(float(w.uvi), 1) # index
-        pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
-        visibility = round(w.visibility_distance / 1000, 1) # m -> km
-        wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
-        wind_dir = self.compass_dir(w.wind()['deg']) # °
-
-        # sun details
-        sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
-        sunset = datetime.fromtimestamp(int(w.sunset_time()), tz)
-        sunrise_str = sunrise.strftime('%I:%M %p')
-        sunset_str = sunset.strftime('%I:%M %p')
-        
-        await ctx.send(f">>> {loc_str} | {temp}°C {status_emoji}\n"
-                        f"Feels like: {feels_like}°C | "
-                        f"Humidity: {humidity}% | "
-                        f"Wind: {wind_speed} km/h {wind_dir}\n"
-                        f"Clouds: {cloud_cover}% | UV: {uv} | "
-                        f"Visibility: {visibility} km\n"
-                        f"Dew point: {dew_point}°C | "
-                        f"Pressure: {pressure} kPa\n"
-                        f"Sunrise: {sunrise_str} | Sunset: {sunset_str}\n"
-                        f"Updated {time_str} "
-                        f"({obs.timezone})")
 
     @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
@@ -272,6 +209,69 @@ class Weather(commands.Cog):
                 await self.forecast(ctx, *args)
         else:
             await self.forecast(ctx, '-12h')
+    
+    @commands.command(aliases=['wr'])
+    async def weather(self, ctx, *, place=''):
+        """
+        Sends a weather report message using OpenWeatherMap data for
+        chosen city.
+                
+        Default location is Toronto, ON.
+        """
+        # get observation and location information
+        try:
+            obs, loc = self.get_obs(place, 'minutely,hourly,daily')
+        except (AttributeError, geopy.exc.GeocoderQueryError) as e:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Couldn't get weather for that location.")
+        except pyowm.commons.exceptions.UnauthorizedError:
+            await ctx.message.add_reaction('\U0001F916');
+            await ctx.send("Couldn't perform the API call.")
+            print("Search failed: Couldn't find OWM token.")
+        
+        w = obs.current
+        
+        # location details
+        loc_str = loc.raw['address']['formattedAddress']
 
+        # time details
+        tz = pytz.timezone(obs.timezone)
+        time = datetime.fromtimestamp(int(w.reference_time()), tz)
+        time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
+        # cursory details
+        t = w.temperature('celsius') # °C
+        temp = int(round(t['temp'])) # °C
+        feels_like = int(round(t['feels_like'])) # °C
+        dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
+        status_emoji = self.weather_emoji(w)
+
+        # other environmental details
+        humidity = w.humidity # %
+        cloud_cover = w.clouds # %
+        uv = round(float(w.uvi), 1) # index
+        pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
+        visibility = round(w.visibility_distance / 1000, 1) # m -> km
+        wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
+        wind_dir = self.compass_dir(w.wind()['deg']) # °
+
+        # sun details
+        sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
+        sunset = datetime.fromtimestamp(int(w.sunset_time()), tz)
+        sunrise_str = sunrise.strftime('%I:%M %p')
+        sunset_str = sunset.strftime('%I:%M %p')
+        
+        await ctx.send(f">>> {loc_str} | {temp}°C {status_emoji}\n"
+                        f"Feels like: {feels_like}°C | "
+                        f"Humidity: {humidity}% | "
+                        f"Wind: {wind_speed} km/h {wind_dir}\n"
+                        f"Clouds: {cloud_cover}% | UV: {uv} | "
+                        f"Visibility: {visibility} km\n"
+                        f"Dew point: {dew_point}°C | "
+                        f"Pressure: {pressure} kPa\n"
+                        f"Sunrise: {sunrise_str} | Sunset: {sunset_str}\n"
+                        f"Updated {time_str} "
+                        f"({obs.timezone})")
+        
 def setup(bot):
     bot.add_cog(Weather(bot))
