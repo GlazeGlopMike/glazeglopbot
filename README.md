@@ -1,5 +1,5 @@
 # GlazeGlopBot
-GlazeGlopBot is a Discord bot intending to convenience members of a private Discord server for the boys. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, random number generator, and weather reporting utilities have been implemented.
+GlazeGlopBot is a Discord bot intending to convenience members of a private Discord server for the boys. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
 ### litwa
 A small suite of "inside joke" commands for the boys.
@@ -11,6 +11,9 @@ Some common guild (server) moderation commands. The command author's server perm
 - Move users across voice channels
 - Disconnecting users from voice channels
 - Kicking/banning users from guilds
+
+### qr
+Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
 
 ### rng
 Currently features a dice roller and random integer generator.
