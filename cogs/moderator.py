@@ -203,13 +203,14 @@ class Moderator(commands.Cog):
             await ctx.send("No users mentioned.")
 
     @commands.command(aliases=['nick'])
-    async def nickname(self, ctx, member:discord.Member, nick):
+    async def nickname(self, ctx, member:discord.Member, *, nick):
         """
         Changes a user's nickname.
 
         Requires Change Nickname permission.
         """
-        if not ctx.author.guild_permissions.change_nickname:
+        if not (member == ctx.author or \
+                ctx.author.guild_permissions.change_nickname):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
             return
@@ -232,8 +233,6 @@ class Moderator(commands.Cog):
         if isinstance(err, commands.errors.MemberNotFound) or \
         isinstance(err, commands.errors.MissingRequiredArgument):
             nick_args = ctx.message.content.split()[1:]
-            print(err)
-            print(nick_args)
             
             if 'member' in str(err) and not nick_args:
                 await ctx.message.add_reaction('\U0001F615');
