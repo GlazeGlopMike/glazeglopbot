@@ -72,6 +72,28 @@ class Litwa(commands.Cog):
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No users mentioned.")
+
+    @commands.command()
+    async def momtibi(self, ctx):
+        """
+        Accepts a list of Discord Member objects.
+        Insults tagged users' mothers, or the author's if no users named.
+        """
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            tags = len(mentions)
+            
+            if tags == 1:
+                await ctx.send(f"{mentions[0].mention} momtibi gaeree lol")
+            else:
+                await ctx.send(f"{self.user_chain(mentions)} "
+                               "momsvobis gaeree lmfao")
+        elif len(ctx.message.content.split()) > 1:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Unrecognized user(s).")
+        else:
+            await ctx.send(f"{ctx.author.mention} momtibi gaeree lol")
     
     @bontibi.error
     @gaeree.error
