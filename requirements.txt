@@ -1,5 +1,7 @@
 discord.py[voice]
 geopy
 pyowm
+pypng
+pyqrcode
 python-dotenv
 pytz

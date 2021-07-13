@@ -28,7 +28,6 @@ class QR(commands.Cog):
         # send image and delete temporary file
         await ctx.send(file=discord.File(path))
         os.remove(path)
-        
     
 def setup(bot):
     bot.add_cog(QR(bot))
