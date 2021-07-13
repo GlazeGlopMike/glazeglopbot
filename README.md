@@ -5,7 +5,12 @@ GlazeGlopBot is a Discord bot intending to convenience members of a private Disc
 A small suite of "inside joke" commands for the boys.
 
 ### moderator
-Some common guild (server) moderation commands (e.g. moving users across voice channels, disconnecting them, or kicking them from the guild).
+Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
+- Nicknaming users
+- Pinning/unpinning messages
+- Move users across voice channels
+- Disconnecting users from voice channels
+- Kicking/banning users from guilds
 
 ### rng
 Currently features a dice roller and random integer generator.

@@ -243,6 +243,31 @@ class Moderator(commands.Cog):
             else:
                 await self.nickname(ctx, ctx.author, ' '.join(nick_args))
                 
+    @commands.command()
+    async def pin(self, ctx):
+        """
+        Pins the referenced message.
+
+        Requires Delete Messages permission.
+        """
+        if not ctx.author.guild_permissions.manage_messages:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+        
+        ref = ctx.message.reference
+        
+        if ref and ref.message_id:
+            target = await ctx.channel.fetch_message(ref.message_id)
+
+            if target.pinned:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("Message already pinned.")
+            else:
+                await target.pin()
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No message referenced.")
 
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
@@ -289,5 +314,32 @@ class Moderator(commands.Cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("No users mentioned.")
 
+    @commands.command()
+    async def unpin(self, ctx):
+        """
+        Unpins the referenced message.
+
+        Requires Delete Messages permission.
+        """
+        if not ctx.author.guild_permissions.manage_messages:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+        
+        ref = ctx.message.reference
+        
+        if ref and ref.message_id:
+            target = await ctx.channel.fetch_message(ref.message_id)
+
+            if target.pinned:
+                await target.unpin()
+                await ctx.send("Message unpinned.")
+            else:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("Message not pinned.")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No message referenced.")
+    
 def setup(bot):
     bot.add_cog(Moderator(bot))
