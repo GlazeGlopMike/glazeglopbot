@@ -91,5 +91,26 @@ class Litwa(commands.Cog):
         """Sends a 'REE' text-to-speech message."""
         await ctx.send('REE-EEE-EEE-EEE-EEE-EEE!', tts=True)
 
+    @commands.command(name='1984')
+    async def orwell(self, ctx):
+        """
+        Deletes the referenced message.
+
+        Requires Delete Messages permission.
+        """
+        if not ctx.author.guild_permissions.manage_messages:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+        
+        ref = ctx.message.reference
+        
+        if ref and ref.message_id:
+            target = await ctx.channel.fetch_message(ref.message_id)
+            await target.delete()
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No message referenced.")
+
 def setup(bot):
     bot.add_cog(Litwa(bot))
