@@ -2,7 +2,6 @@
 import os
 import discord
 import dotenv
-import discord
 
 from discord.ext import commands
 
