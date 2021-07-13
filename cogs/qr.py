@@ -1,4 +1,4 @@
-# rng.py
+# qr.py
 import os
 import uuid
 import discord
