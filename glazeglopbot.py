@@ -1,9 +1,10 @@
 # glazeglopbot.py
 import os
-
 import discord
-from discord.ext import commands
 import dotenv
+import discord
+
+from discord.ext import commands
 
 # setting up client
 dotenv.load_dotenv()
