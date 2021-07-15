@@ -7,7 +7,7 @@ class Moderator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def skipped_msg(self, ctx, members):
+    def skipped_msg(ctx, members):
         """
         Accepts a list of skipped Members.
         Sends a formatted message listing these users.
@@ -24,7 +24,7 @@ class Moderator(commands.Cog):
             for member in members[:-1]:
                 msg += f'{member.name}, '
             msg += f'and {members[-1].name}'
-        return msg
+        return msg + '.'
 
     @commands.command()
     async def ban(self, ctx):
@@ -57,7 +57,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send("Some user(s) successfully banned. "
-                               f"{self.skipped_msg(ctx, skipped)}")
+                               f"{Moderator.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized user mention(s).")
@@ -106,7 +106,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send("Some video stream(s) successfully moved. "
-                               f"{self.skipped_msg(ctx, skipped)}")
+                               f"{Moderator.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("Unrecognized user mention(s).")
@@ -149,7 +149,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send("Some user(s) successfully disconnected. "
-                               f"{self.skipped_msg(ctx, skipped)}")
+                               f"{Moderator.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("Unrecognized user mention(s).")
@@ -194,7 +194,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send("Some user(s) successfully kicked. "
-                               f"{self.skipped_msg(ctx, skipped)}")
+                               f"{Moderator.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized user mention(s).")
@@ -305,7 +305,7 @@ class Moderator(commands.Cog):
             else:
                 await ctx.message.add_reaction('\u26A0');
                 await ctx.send("Some user(s) successfully moved. "
-                               f"{self.skipped_msg(ctx, skipped)}")
+                               f"{Moderator.skipped_msg(ctx, skipped)}")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized user mention(s).")
