@@ -87,36 +87,61 @@ class Weather(commands.Cog):
         
         # return weather data and location
         return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
-        
     
-    def weather_emoji(self, w):
+    def uv_emoji(self, uv):
         """
-        Accepts a Weather object.
+        Accepts a float UV index value
+        Returns an emoji corresponding to the risk of harm from UV
+        
+        See https://openweathermap.org/weather-conditions
+        """
+        # negative values
+        if uv < 0:
+            raise ValueError("UV index cannot be negative.")
+        # low -> green
+        elif uv <= 2:
+            return '\U0001F7E9'
+        # moderate -> yellow
+        elif uv <= 5:
+            return '\U0001F7E8'
+        # high -> orange
+        elif uv <= 7:
+            return '\U0001F7E7'
+        # very high -> red
+        elif uv <= 10:
+            return '\U0001F7E5'
+        # extreme -> violet
+        else:
+            return '\U0001F7EA'
+
+    def weather_emoji(self, code):
+        """
+        Accepts a weather code integer.
         Returns an emoji corresponding to an OpenWeatherMap weather code
         
         See https://openweathermap.org/weather-conditions
         """
         # thunderstorms
-        if int(w.weather_code / 100) == 2:
+        if int(code / 100) == 2:
             return '\U0001F329'
         # rain
-        elif int(w.weather_code / 100) == 3 or int(w.weather_code / 100) == 5:
+        elif int(code / 100) == 3 or int(code / 100) == 5:
             return '\U0001F327'
         # snow
-        elif int(w.weather_code / 100) == 6:
+        elif int(code / 100) == 6:
             return '\u2744'
         # sun
-        elif w.weather_code == 800:
+        elif code == 800:
             return '\u2600'
         # few clouds
-        elif w.weather_code >= 801 and w.weather_code <= 803:
+        elif code >= 801 and code <= 803:
             return '\u26C5'
         # clouds
-        elif w.weather_code == 804:
+        elif code == 804:
             return '\u2601'
         # unrecognized code
         else:
-            raise ValueError("Unrecognized weather ID.")
+            raise ValueError("Unrecognized weather ID: '{code}'.")
 
     @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
@@ -162,7 +187,7 @@ class Weather(commands.Cog):
 
                     # cursory details
                     temp = int(round(f.temperature('celsius')['temp'])) # °C
-                    status_emoji = self.weather_emoji(f)
+                    status_emoji = self.weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
 
                     # append data to lists
@@ -221,7 +246,7 @@ class Weather(commands.Cog):
                     t = f.temperature('celsius')
                     day_temp = int(round(t['day'])) # °C
                     night_temp = int(round(t['night'])) # °C
-                    status_emoji = self.weather_emoji(f)
+                    status_emoji = self.weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
                     
                     # append data to lists
@@ -287,12 +312,13 @@ class Weather(commands.Cog):
         temp = int(round(t['temp'])) # °C
         feels_like = int(round(t['feels_like'])) # °C
         dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-        status_emoji = self.weather_emoji(w)
+        status_emoji = self.weather_emoji(w.weather_code)
 
         # other environmental details
         humidity = w.humidity # %
         cloud_cover = w.clouds # %
         uv = round(float(w.uvi), 1) # index
+        uv_emoji = self.uv_emoji(uv)
         pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
         visibility = round(w.visibility_distance / 1000, 1) # m -> km
         wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
@@ -301,20 +327,35 @@ class Weather(commands.Cog):
         # sun details
         sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
         sunset = datetime.fromtimestamp(int(w.sunset_time()), tz)
-        sunrise_str = sunrise.strftime('%I:%M %p')
-        sunset_str = sunset.strftime('%I:%M %p')
-        
-        await ctx.send(f">>> {loc_str} | {temp}°C {status_emoji}\n"
-                        f"Feels like: {feels_like}°C | "
-                        f"Humidity: {humidity}% | "
-                        f"Wind: {wind_speed} km/h {wind_dir}\n"
-                        f"Clouds: {cloud_cover}% | UV: {uv} | "
-                        f"Visibility: {visibility} km\n"
-                        f"Dew point: {dew_point}°C | "
-                        f"Pressure: {pressure} kPa\n"
-                        f"Sunrise: {sunrise_str} | Sunset: {sunset_str}\n"
-                        f"Updated {time_str} "
-                        f"({obs.timezone})")
+        sunrise_str = sunrise.strftime('%-I:%M %p')
+        sunset_str = sunset.strftime('%-I:%M %p')
+
+        # build embed
+        embed = discord.Embed(title=loc_str)
+
+        # generate embed fields
+        embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
+                        inline=True)
+        embed.add_field(name='Feels like', value=f'{feels_like}°C',
+                        inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+        embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
+                        inline=True)
+        embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
+        embed.add_field(name='UV index', value=f'{uv} {uv_emoji}', inline=True)
+        embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
+        embed.add_field(name='Visibility', value=f'{visibility} km',
+                        inline=True)
+        embed.add_field(name='Pressure', value=f'{pressure} kPa', inline=True)
+        embed.add_field(name='Sunrise', value=sunrise_str, inline=True)
+        embed.add_field(name='Sunset', value=sunset_str, inline=True)
+        embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+        # add footer
+        embed.set_footer(text=f"Retrieved: {time_str} "
+                         f"({obs.timezone})")
+
+        await ctx.send(embed=embed)
         
 def setup(bot):
     bot.add_cog(Weather(bot))
