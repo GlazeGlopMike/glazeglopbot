@@ -1,12 +1,13 @@
 # weather.py
 import os
-
-from datetime import datetime
-from discord.ext import commands
+import discord
 import dotenv
 import geopy, geopy.geocoders
 import pyowm
 import pytz
+
+from datetime import datetime
+from discord.ext import commands
 
 class Weather(commands.Cog):
     """
@@ -177,16 +178,22 @@ class Weather(commands.Cog):
                     print("Search failed: Couldn't find OWM token.")
 
                 forecasts = obs.forecast_daily
-                f_list = []
+                days = []
+                data = []
 
                 # location details
                 loc_str = loc.raw['address']['formattedAddress']
 
+                # time details
+                tz = pytz.timezone(obs.timezone)
+                current = int(obs.current.reference_time())
+                time = datetime.fromtimestamp(int(current), tz)
+                time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
                 for f in forecasts:
                     # time details
-                    tz = pytz.timezone(obs.timezone)
-                    time = datetime.fromtimestamp(int(f.reference_time()), tz)
-                    time_str = time.strftime('%a %-d')
+                    date = datetime.fromtimestamp(int(f.reference_time()), tz)
+                    date_str = date.strftime('%a %b %-d')
 
                     # cursory details
                     t = f.temperature('celsius')
@@ -195,12 +202,25 @@ class Weather(commands.Cog):
                     status_emoji = self.weather_emoji(f)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
                     
-                    f_list.append(f"{time_str} | {day_temp}°C {status_emoji} | "
-                                  f"Night: {night_temp}°C | POP: {pop}%")
+                    # append data to lists
+                    days.append(date_str)
+                    data.append(f"{status_emoji}\nDay: {day_temp}°C\n"
+                                f"Night: {night_temp}°C\nPOP: {pop}%")
 
-                f_str = '\n'.join(f_list)
+                # build embed
+                embed = discord.Embed(title=loc_str,description='Daily Forecast')
 
-                await ctx.send(f">>> {loc_str}\n{f_str}")
+                # generate embed fields
+                for i in range(len(days)):
+                    embed.add_field(name=days[i], value=data[i], inline=True)
+
+                embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+                # add footer
+                embed.set_footer(text=f"Retrieved: {time_str} "
+                                 f"({obs.timezone})")
+                
+                await ctx.send(embed=embed)
             elif args[0] == '-current' or args[0] == '-now':
                 place = ' '.join(args[1:])
                 await self.weather(ctx, place=place)
