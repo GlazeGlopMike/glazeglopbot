@@ -19,7 +19,7 @@ class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    def compass_dir(self, angle):
+    def compass_dir(angle):
         """
         Accepts a float angle in [0°,360°).
         Returns a 16-wind direction abbreviation str.
@@ -59,7 +59,7 @@ class Weather(commands.Cog):
         elif angle < 348.75:
             return 'NNW'
     
-    def get_obs(self, place='', exclude=''):
+    def get_obs(place='', exclude=''):
         """
         Accepts a place string and any parts of the One Call data to ignore.
         Returns a tuple with a PyOWM OneCall object and geopy Location object.
@@ -88,7 +88,7 @@ class Weather(commands.Cog):
         # return weather data and location
         return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
     
-    def uv_emoji(self, uv):
+    def uv_emoji(uv):
         """
         Accepts a float UV index value
         Returns an emoji corresponding to the risk of harm from UV
@@ -113,8 +113,8 @@ class Weather(commands.Cog):
         # extreme -> violet
         else:
             return '\U0001F7EA'
-
-    def weather_emoji(self, code):
+    
+    def weather_emoji(code):
         """
         Accepts a weather code integer.
         Returns an emoji corresponding to an OpenWeatherMap weather code
@@ -156,7 +156,7 @@ class Weather(commands.Cog):
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
-                    obs, loc = self.get_obs(place, 'minutely,daily')
+                    obs, loc = Weather.get_obs(place, 'minutely,daily')
                 except (AttributeError, geopy.exc.GeocoderQueryError) as e:
                     await ctx.message.add_reaction('\U0001F615');
                     await ctx.send(f"Couldn't get a forecast for that "
@@ -187,7 +187,7 @@ class Weather(commands.Cog):
 
                     # cursory details
                     temp = int(round(f.temperature('celsius')['temp'])) # °C
-                    status_emoji = self.weather_emoji(f.weather_code)
+                    status_emoji = Weather.weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
 
                     # append data to lists
@@ -214,7 +214,7 @@ class Weather(commands.Cog):
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
-                    obs, loc = self.get_obs(place, 'minutely,hourly')
+                    obs, loc = Weather.get_obs(place, 'minutely,hourly')
                 except (AttributeError, geopy.exc.GeocoderQueryError) as e:
                     await ctx.message.add_reaction('\U0001F615');
                     await ctx.send(f"Couldn't get a forecast for that "
@@ -246,7 +246,7 @@ class Weather(commands.Cog):
                     t = f.temperature('celsius')
                     day_temp = int(round(t['day'])) # °C
                     night_temp = int(round(t['night'])) # °C
-                    status_emoji = self.weather_emoji(f.weather_code)
+                    status_emoji = Weather.weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
                     
                     # append data to lists
@@ -288,7 +288,7 @@ class Weather(commands.Cog):
         """
         # get observation and location information
         try:
-            obs, loc = self.get_obs(place, 'minutely,hourly,daily')
+            obs, loc = Weather.get_obs(place, 'minutely,hourly,daily')
         except (AttributeError, geopy.exc.GeocoderQueryError) as e:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't get weather for that location.")
@@ -312,17 +312,17 @@ class Weather(commands.Cog):
         temp = int(round(t['temp'])) # °C
         feels_like = int(round(t['feels_like'])) # °C
         dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-        status_emoji = self.weather_emoji(w.weather_code)
+        status_emoji = Weather.weather_emoji(w.weather_code)
 
         # other environmental details
         humidity = w.humidity # %
         cloud_cover = w.clouds # %
         uv = round(float(w.uvi), 1) # index
-        uv_emoji = self.uv_emoji(uv)
+        uv_emoji = Weather.uv_emoji(uv)
         pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
         visibility = round(w.visibility_distance / 1000, 1) # m -> km
         wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
-        wind_dir = self.compass_dir(w.wind()['deg']) # °
+        wind_dir = Weather.compass_dir(w.wind()['deg']) # °
 
         # sun details
         sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
