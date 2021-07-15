@@ -142,27 +142,49 @@ class Weather(commands.Cog):
                     print("Search failed: Couldn't find OWM token.")
 
                 forecasts = obs.forecast_hourly[:13]
-                f_list = []
+                hours = []
+                data = []
 
                 # location details
                 loc_str = loc.raw['address']['formattedAddress']
 
-                for f in forecasts:
-                    # time details
+                # time details
+                tz = pytz.timezone(obs.timezone)
+                current = int(obs.current.reference_time())
+                time = datetime.fromtimestamp(int(current), tz)
+                time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
+                for f in forecasts[:-1]:
+                    # hourly details
                     tz = pytz.timezone(obs.timezone)
-                    time = datetime.fromtimestamp(int(f.reference_time()), tz)
-                    time_str = time.strftime('%-I %p')
+                    hour = datetime.fromtimestamp(int(f.reference_time()), tz)
+                    hour_str = hour.strftime('%-I %p')
 
                     # cursory details
                     temp = int(round(f.temperature('celsius')['temp'])) # °C
                     status_emoji = self.weather_emoji(f)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
-                    
-                    f_list.append(f"{time_str} | {temp}°C {status_emoji} | "
-                                  f"POP: {pop}%")
 
-                f_str = '\n'.join(f_list)
-                await ctx.send(f">>> {loc_str}\n{f_str}")
+                    # append data to lists
+                    hours.append(hour_str)
+                    data.append(f"{status_emoji}\n{temp}°C\nPOP: {pop}%")
+
+                # build embed
+                embed = discord.Embed(title=loc_str,
+                                      description='Hourly Forecast')
+
+                # generate embed fields
+                for i in range(len(hours)):
+                    embed.add_field(name=hours[i], value=data[i], inline=True)
+                    
+                # add blank field for alignment
+                # embed.add_field(name='\u200b', value='\u200b', inline=True)
+
+                # add footer
+                embed.set_footer(text=f"Retrieved: {time_str} "
+                                 f"({obs.timezone})")
+                
+                await ctx.send(embed=embed)
             elif args[0] == '-7d' or args[0] == '-daily':
                 # get observation and location information
                 try:
@@ -213,7 +235,8 @@ class Weather(commands.Cog):
                 # generate embed fields
                 for i in range(len(days)):
                     embed.add_field(name=days[i], value=data[i], inline=True)
-
+                    
+                # add blank field for alignment
                 embed.add_field(name='\u200b', value='\u200b', inline=True)
 
                 # add footer
