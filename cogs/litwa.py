@@ -17,10 +17,8 @@ class Litwa(commands.Cog):
         elif len(users) == 2:
             return f'{users[0].mention} and {users[1].mention}'
         elif len(users) > 2:
-            users_cs = ""
-            for user in users[:-1]:
-                users_cs += f'{user.mention}, '
-            return f'{users_cs}and {users[-1].mention}'
+            users_cs = ', '.join(users[:-1])
+            return f'{users_cs}, and {users[-1].mention}'
         else:
             return ""
     
