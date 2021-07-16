@@ -102,10 +102,12 @@ async def on_message(message):
 for path, subdirs, files in os.walk('cogs'):
     for file in files:
         if file[-3:] == '.py':
+            cog = file[:-3]
+            
             try:
-                bot.load_extension('cogs.' + file[:-3])
+                bot.load_extension('cogs.' + cog)
             except Exception as e:
-                print(f"Failed to load extension '{ext}'.")
+                print(f"Failed to load extension '{cog}.'")
 
 try:
     bot.run(token)
