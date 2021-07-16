@@ -5,6 +5,7 @@ import dotenv
 import geopy, geopy.geocoders
 import pyowm
 import pytz
+import requests
 
 from datetime import datetime
 from discord.ext import commands
@@ -201,10 +202,7 @@ class Weather(commands.Cog):
                 # generate embed fields
                 for i in range(len(hours)):
                     embed.add_field(name=hours[i], value=data[i], inline=True)
-                    
-                # add blank field for alignment
-                # embed.add_field(name='\u200b', value='\u200b', inline=True)
-
+                
                 # add footer
                 embed.set_footer(text=f"Retrieved: {time_str} "
                                  f"({obs.timezone})")
