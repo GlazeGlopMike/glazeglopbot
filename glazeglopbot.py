@@ -16,7 +16,7 @@ async def load(ctx, *, cog):
     try:
         bot.load_extension('cogs.' + cog)
         await ctx.send(f"Loaded cog '{cog}'.")
-    except commands.ExtensionError:
+    except commands.ExtensionError as e:
         if "already" in str(e): # restart if cog already loaded
             await restart(ctx, cog=cog)
         else:
@@ -35,21 +35,27 @@ async def restart(ctx, *, cog):
             await ctx.send(f"Reloaded cog '{cog}'.")
         except commands.ExtensionError:
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("Unrecognized cog.")
+            await ctx.send("Cog unrecognized or currently inactive.")
 
 @bot.command(name='reloadall', aliases=['rldall'])
 async def reload_all(ctx):
     """Reloads all DIscord cogs in the directory."""
-
+    failed = []
+    
     for path, subdirs, files in os.walk('cogs'):
         for file in files:
+            cog = file[:-3]
+            
             if file[-3:] == '.py':
                 try:
                     bot.reload_extension('cogs.' + file[:-3])
-                except (AttributeError, ImportError, commands.ExtensionError):
-                    print(f"Failed to reload extension '{file[:-3]}'.")
-    
-    await ctx.send(f"Reloaded cogs.")
+                except Exception:
+                    failed.append(cog)
+
+    if failed:
+        await ctx.send(f"Some cogs not reloaded: {', '.join(failed)}.")
+    else:
+        await ctx.send("All cogs reloaded. " + err_msg)
 
 @bot.command(name='reloadenv', aliases=['rldenv'])
 async def reload_env(ctx):
@@ -64,7 +70,7 @@ async def unload(ctx, *, cog):
         await ctx.send(f"Unloaded cog '{cog}'.")
     except commands.ExtensionError:
         await ctx.message.add_reaction('\U0001F615');
-        await ctx.send("Unrecognized cog.")
+        await ctx.send("Cog unrecognized or already inactive.")
 
 @load.error
 @restart.error
@@ -74,6 +80,8 @@ async def load_err(ctx, err):
     if isinstance(err, commands.errors.MissingRequiredArgument):
         await ctx.message.add_reaction('\U0001F615');
         await ctx.send(f"Module name required.")
+    else:
+        print(err)
 
 @bot.event
 async def on_ready():

@@ -7,7 +7,7 @@ class Litwa(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def user_chain(self, users):
+    def user_chain(users):
         """
         Accepts a list of Discord Member objects
         Returns a formatted str listing their tags"
@@ -38,7 +38,7 @@ class Litwa(commands.Cog):
             if tags == 1:
                 await ctx.send(f"Bontibi, {mentions[0].mention}!")
             else:
-                await ctx.send(f"Bonivobis, {self.user_chain(mentions)}!")
+                await ctx.send(f"Bonivobis, {Litwa.user_chain(mentions)}!")
         elif len(ctx.message.content.split()) > 1:
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send(f"Unrecognized user(s).")
@@ -59,7 +59,7 @@ class Litwa(commands.Cog):
             if tags == 1:
                 await ctx.send(f"{mentions[0].mention} is gaeree!")
             else:
-                await ctx.send(f"{self.user_chain(mentions)} are gaeree!")
+                await ctx.send(f"{Litwa.user_chain(mentions)} are gaeree!")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Unrecognized user(s).")
@@ -80,7 +80,7 @@ class Litwa(commands.Cog):
             if tags == 1:
                 await ctx.send(f"{mentions[0].mention} momtibi gaeree lol")
             else:
-                await ctx.send(f"{self.user_chain(mentions)} "
+                await ctx.send(f"{Litwa.user_chain(mentions)} "
                                "momsvobis gaeree lmfao")
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
