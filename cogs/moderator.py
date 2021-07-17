@@ -202,10 +202,33 @@ class Moderator(commands.Cog):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("No users mentioned.")
 
+    @commands.command()
+    async def mute(self, ctx):
+        """
+        Server mutes a user.
+
+        Requires Mute Users permission.
+        """
+        if not ctx.author.guild_permissions.mute_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            for user in mentions:
+                await user.edit(mute=mute)
+
+            await ctx.send("Muted user(s).")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("No users mentioned.")
+
     @commands.command(aliases=['nick'])
     async def nickname(self, ctx, member:discord.Member, *, nick):
         """
-        Changes a user's nickname.
+        Changes a user's nickname (the command author's by default).
 
         Requires Change Nickname permission.
         """
