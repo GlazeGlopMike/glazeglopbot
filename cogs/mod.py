@@ -1,4 +1,4 @@
-# moderator.py
+# mod.py
 import discord
 from discord.ext import commands
 
