@@ -5,10 +5,133 @@ import dotenv
 import geopy, geopy.geocoders
 import pyowm
 import pytz
-import requests
 
 from datetime import datetime
 from discord.ext import commands
+
+def compass_dir(angle):
+    """
+    Accepts a float angle in [0°,360°).
+    Returns a 16-wind direction abbreviation str.
+    """
+    if angle < 0 or angle >= 360:
+        raise ValueError("Bearing not in domain.")
+    elif angle < 11.25 or angle >= 348.75:
+        return 'N'
+    elif angle < 33.75:
+        return 'NNE'
+    elif angle < 56.25:
+        return 'NE'
+    elif angle < 78.75:
+        return 'ENE'
+    elif angle < 101.25:
+        return 'E'
+    elif angle < 123.75:
+        return 'ESE'
+    elif angle < 146.25:
+        return 'SE'
+    elif angle < 168.75:
+        return 'SSE'
+    elif angle < 191.25:
+        return 'S'
+    elif angle < 213.75:
+        return 'SSW'
+    elif angle < 236.25:
+        return 'SW'
+    elif angle < 258.75:
+        return 'WSW'
+    elif angle < 281.25:
+        return 'W'
+    elif angle < 303.75:
+        return 'WNW'
+    elif angle < 326.25:
+        return 'NW'
+    elif angle < 348.75:
+        return 'NNW'
+
+def get_obs(place='', exclude=''):
+    """
+    Accepts a place string and any parts of the One Call data to ignore.
+    Returns a tuple with a PyOWM OneCall object and geopy Location object.
+
+    Default place is Toronto, ON.
+
+    Observation taken using OWM One Call API.
+    https://openweathermap.org/api/one-call-api
+    
+    Geocoding performed with Bing Maps Location API.
+    https://docs.microsoft.com/en-us/bingmaps/rest-services/locations/
+    """
+    # set up weather manager
+    dotenv.load_dotenv()
+    owm = pyowm.OWM(os.getenv('OWM_TOKEN'))
+    mgr = owm.weather_manager()
+
+    # default place is Toronto, ON
+    if place.strip() == '':
+        place = 'Toronto, ON'
+
+    # find location from search string using Bing Maps
+    geocoder = geopy.geocoders.Bing(os.getenv('BING_MAPS_TOKEN'))
+    l = geocoder.geocode(place, exactly_one=True, culture='en')
+    
+    # return weather data and location
+    return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
+
+def uv_emoji(uv):
+    """
+    Accepts a float UV index value.
+    Returns an emoji corresponding to the risk of harm from UV.
+    
+    See https://openweathermap.org/weather-conditions
+    """
+    # negative values
+    if uv < 0:
+        raise ValueError("UV index cannot be negative.")
+    # low -> green
+    elif uv <= 2:
+        return '\U0001F7E9'
+    # moderate -> yellow
+    elif uv <= 5:
+        return '\U0001F7E8'
+    # high -> orange
+    elif uv <= 7:
+        return '\U0001F7E7'
+    # very high -> red
+    elif uv <= 10:
+        return '\U0001F7E5'
+    # extreme -> violet
+    else:
+        return '\U0001F7EA'
+
+def weather_emoji(code):
+    """
+    Accepts a weather code integer.
+    Returns an emoji corresponding to an OpenWeatherMap weather code.
+    
+    See https://openweathermap.org/weather-conditions
+    """
+    # thunderstorms
+    if int(code / 100) == 2:
+        return '\U0001F329'
+    # rain
+    elif int(code / 100) == 3 or int(code / 100) == 5:
+        return '\U0001F327'
+    # snow
+    elif int(code / 100) == 6:
+        return '\u2744'
+    # sun
+    elif code == 800:
+        return '\u2600'
+    # few clouds
+    elif code >= 801 and code <= 803:
+        return '\u26C5'
+    # clouds
+    elif code == 804:
+        return '\u2601'
+    # unrecognized code
+    else:
+        raise ValueError(f"Unrecognized weather ID: '{code}'.")
 
 class Weather(commands.Cog):
     """
@@ -20,130 +143,6 @@ class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
-    def compass_dir(angle):
-        """
-        Accepts a float angle in [0°,360°).
-        Returns a 16-wind direction abbreviation str.
-        """
-        if angle < 0 or angle >= 360:
-            raise ValueError("Bearing not in domain.")
-        elif angle < 11.25 or angle >= 348.75:
-            return 'N'
-        elif angle < 33.75:
-            return 'NNE'
-        elif angle < 56.25:
-            return 'NE'
-        elif angle < 78.75:
-            return 'ENE'
-        elif angle < 101.25:
-            return 'E'
-        elif angle < 123.75:
-            return 'ESE'
-        elif angle < 146.25:
-            return 'SE'
-        elif angle < 168.75:
-            return 'SSE'
-        elif angle < 191.25:
-            return 'S'
-        elif angle < 213.75:
-            return 'SSW'
-        elif angle < 236.25:
-            return 'SW'
-        elif angle < 258.75:
-            return 'WSW'
-        elif angle < 281.25:
-            return 'W'
-        elif angle < 303.75:
-            return 'WNW'
-        elif angle < 326.25:
-            return 'NW'
-        elif angle < 348.75:
-            return 'NNW'
-    
-    def get_obs(place='', exclude=''):
-        """
-        Accepts a place string and any parts of the One Call data to ignore.
-        Returns a tuple with a PyOWM OneCall object and geopy Location object.
-
-        Default place is Toronto, ON.
-
-        Observation taken using OWM One Call API.
-        https://openweathermap.org/api/one-call-api
-        
-        Geocoding performed with Bing Maps Location API.
-        https://docs.microsoft.com/en-us/bingmaps/rest-services/locations/
-        """
-        # set up weather manager
-        dotenv.load_dotenv()
-        owm = pyowm.OWM(os.getenv('OWM_TOKEN'))
-        mgr = owm.weather_manager()
-
-        # default place is Toronto, ON
-        if place.strip() == '':
-            place = 'Toronto, ON'
-
-        # find location from search string using Bing Maps
-        geocoder = geopy.geocoders.Bing(os.getenv('BING_MAPS_TOKEN'))
-        l = geocoder.geocode(place, exactly_one=True, culture='en')
-        
-        # return weather data and location
-        return mgr.one_call(l.latitude, l.longitude, exclude=exclude), l
-    
-    def uv_emoji(uv):
-        """
-        Accepts a float UV index value
-        Returns an emoji corresponding to the risk of harm from UV
-        
-        See https://openweathermap.org/weather-conditions
-        """
-        # negative values
-        if uv < 0:
-            raise ValueError("UV index cannot be negative.")
-        # low -> green
-        elif uv <= 2:
-            return '\U0001F7E9'
-        # moderate -> yellow
-        elif uv <= 5:
-            return '\U0001F7E8'
-        # high -> orange
-        elif uv <= 7:
-            return '\U0001F7E7'
-        # very high -> red
-        elif uv <= 10:
-            return '\U0001F7E5'
-        # extreme -> violet
-        else:
-            return '\U0001F7EA'
-    
-    def weather_emoji(code):
-        """
-        Accepts a weather code integer.
-        Returns an emoji corresponding to an OpenWeatherMap weather code
-        
-        See https://openweathermap.org/weather-conditions
-        """
-        # thunderstorms
-        if int(code / 100) == 2:
-            return '\U0001F329'
-        # rain
-        elif int(code / 100) == 3 or int(code / 100) == 5:
-            return '\U0001F327'
-        # snow
-        elif int(code / 100) == 6:
-            return '\u2744'
-        # sun
-        elif code == 800:
-            return '\u2600'
-        # few clouds
-        elif code >= 801 and code <= 803:
-            return '\u26C5'
-        # clouds
-        elif code == 804:
-            return '\u2601'
-        # unrecognized code
-        else:
-            raise ValueError("Unrecognized weather ID: '{code}'.")
-
     @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
         """
@@ -158,7 +157,7 @@ class Weather(commands.Cog):
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
-                    obs, loc = Weather.get_obs(place, 'minutely,daily')
+                    obs, loc = get_obs(place, 'minutely,daily')
                 except (AttributeError, geopy.exc.GeocoderQueryError) as e:
                     await ctx.message.add_reaction('\U0001F615');
                     await ctx.send(f"Couldn't get a forecast for that "
@@ -189,7 +188,7 @@ class Weather(commands.Cog):
 
                     # cursory details
                     temp = int(round(f.temperature('celsius')['temp'])) # °C
-                    status_emoji = Weather.weather_emoji(f.weather_code)
+                    status_emoji = weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
 
                     # append data to lists
@@ -213,7 +212,7 @@ class Weather(commands.Cog):
                 # get observation and location information
                 try:
                     place = ' '.join(args[1:])
-                    obs, loc = Weather.get_obs(place, 'minutely,hourly')
+                    obs, loc = get_obs(place, 'minutely,hourly')
                 except (AttributeError, geopy.exc.GeocoderQueryError) as e:
                     await ctx.message.add_reaction('\U0001F615');
                     await ctx.send(f"Couldn't get a forecast for that "
@@ -245,7 +244,7 @@ class Weather(commands.Cog):
                     t = f.temperature('celsius')
                     day_temp = int(round(t['day'])) # °C
                     night_temp = int(round(t['night'])) # °C
-                    status_emoji = Weather.weather_emoji(f.weather_code)
+                    status_emoji = weather_emoji(f.weather_code)
                     pop = int(round(f.precipitation_probability * 100)) # -> %
                     
                     # append data to lists
@@ -277,7 +276,7 @@ class Weather(commands.Cog):
         else:
             await self.forecast(ctx, '-12h')
     
-    @commands.command(aliases=['wr'])
+    @commands.command()
     async def weather(self, ctx, *, place=''):
         """
         Sends a weather report message.
@@ -287,7 +286,7 @@ class Weather(commands.Cog):
         """
         # get observation and location information
         try:
-            obs, loc = Weather.get_obs(place, 'minutely,hourly,daily')
+            obs, loc = get_obs(place, 'minutely,hourly,daily')
         except (AttributeError, geopy.exc.GeocoderQueryError) as e:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Couldn't get weather for that location.")
@@ -311,17 +310,17 @@ class Weather(commands.Cog):
         temp = int(round(t['temp'])) # °C
         feels_like = int(round(t['feels_like'])) # °C
         dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-        status_emoji = Weather.weather_emoji(w.weather_code)
+        status_emoji = weather_emoji(w.weather_code)
 
         # other environmental details
         humidity = w.humidity # %
         cloud_cover = w.clouds # %
         uv = round(float(w.uvi), 1) # index
-        uv_emoji = Weather.uv_emoji(uv)
+        uv_color = uv_emoji(uv)
         pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
         visibility = round(w.visibility_distance / 1000, 1) # m -> km
         wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
-        wind_dir = Weather.compass_dir(w.wind()['deg']) # °
+        wind_dir = compass_dir(w.wind()['deg']) # °
 
         # sun details
         sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
@@ -341,7 +340,7 @@ class Weather(commands.Cog):
         embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
                         inline=True)
         embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
-        embed.add_field(name='UV index', value=f'{uv} {uv_emoji}', inline=True)
+        embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
         embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
         embed.add_field(name='Visibility', value=f'{visibility} km',
                         inline=True)
