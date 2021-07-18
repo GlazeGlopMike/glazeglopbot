@@ -1,6 +1,7 @@
 # GlazeGlopBot
 GlazeGlopBot is a Discord bot intending to convenience members of a private Discord server for the boys. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
+## Cogs
 ### Litwa
 A small suite of "inside joke" commands for the boys.
 
