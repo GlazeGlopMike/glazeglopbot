@@ -6,6 +6,7 @@ A small suite of "inside joke" commands for the boys.
 
 ### moderator
 Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
+- Muting users
 - Nicknaming users
 - Pinning/unpinning messages
 - Move users across voice channels
@@ -30,6 +31,8 @@ The weather cog can grab:
 - 7-day daily forecast
 
 ## Setup
+Want to run your own instance?
+
 You can set up your own version of GlazeGlopBot with your own API tokens.
 
 1. Clone the repository.
@@ -47,7 +50,7 @@ The weather cog also requires:
 
 4. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
 
-5. Add the values from steps 3 and 4 into ```.env```. If the file doesn't exist, create one with the following contents.
+5. Add the values from steps 3 and 4 into ```.env```. If the file doesn't exist, create one with these contents:
 ```
 DISCORD_TOKEN=[Discord token]
 BING_MAPS_TOKEN=[Bing Maps token]
@@ -61,7 +64,7 @@ FFMPEG_PATH=[FFmpeg path]
 ### Commands
 Within Discord guilds, the bot responds to commands prefixed with the ```$``` character (e.g. ```$ree```). Users can be passed as arguments by tagging them.
 
-e.g. ```$bontibi``` to request a greeting.
+View the list of commands using ```$help```.
 
 ### Cogs
 All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
@@ -72,14 +75,13 @@ All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on st
 
 You can add your own custom-written cogs to that folder and load them, as long as there are no cog or command naming conflicts.
 
+### Environment File
+Updates to ```.env``` can be applied using ```$rldenv```. See steps 3 to 5 in [Setup](#setup) for more details.
+
 ### Sound
 OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice channels using ```$sound [name]```. You can add your own too.
 
-
-Updates to ```.env``` can be applied using ```$rldenv```.
-
 ## Planned Future Additions
-- Built-in help commands
+- Music streaming from YouTube
 - Stock summaries
-- Music streaming from YouTube, Spotify, etc.
-- Voice channel presence with text-to-speech
+- Translation between Standard and "Glopesian" English
