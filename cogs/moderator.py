@@ -115,6 +115,29 @@ class Moderator(commands.Cog):
             await ctx.send("No users mentioned.")
 
         await temp_channel.delete()
+
+    @commands.command()
+    async def deafen(self, ctx):
+        """
+        Server deafens a user.
+
+        Requires Deafen Members permission.
+        """
+        if not ctx.author.guild_permissions.deafen_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            for user in mentions:
+                await user.edit(deafen=True)
+
+            await ctx.send("Deafened user(s).")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("No users mentioned.")
     
     @commands.command(aliases=['dc'])
     async def disconnect(self, ctx):
@@ -169,7 +192,7 @@ class Moderator(commands.Cog):
         """
         Kicks tagged users from the guild.
 
-        Requires Kick Users permission.
+        Requires Kick Members permission.
         """
         if not ctx.author.guild_permissions.kick_members:
             await ctx.message.add_reaction('\U0001F44E');
@@ -208,7 +231,7 @@ class Moderator(commands.Cog):
         """
         Server mutes a user.
 
-        Requires Mute Users permission.
+        Requires Mute Members permission.
         """
         if not ctx.author.guild_permissions.mute_members:
             await ctx.message.add_reaction('\U0001F44E');
@@ -343,7 +366,7 @@ class Moderator(commands.Cog):
         """
         Server unmutes a user.
 
-        Requires Mute Users permission.
+        Requires Mute Members permission.
         """
         if not ctx.author.guild_permissions.mute_members:
             await ctx.message.add_reaction('\U0001F44E');
@@ -357,6 +380,29 @@ class Moderator(commands.Cog):
                 await user.edit(mute=False)
 
             await ctx.send("Unmuted user(s).")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("No users mentioned.")
+
+    @commands.command()
+    async def undeafen(self, ctx):
+        """
+        Server undeafens a user.
+
+        Requires Deafen Members permission.
+        """
+        if not ctx.author.guild_permissions.deafen_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            for user in mentions:
+                await user.edit(deafen=False)
+
+            await ctx.send("Undeafened user(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("No users mentioned.")
