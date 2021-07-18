@@ -12,7 +12,7 @@ class RNG(commands.Cog):
     @commands.command(name='randint',aliases=['rndint'])
     async def randominteger(self, ctx, a:int=100, b:int=1):
         """
-        Generates a random integer within the bounds (inclusive).
+        Generates a random integer within given bounds (inclusive).
         
         Swaps values if given in descending order.
         Uses 1 as the lower bound one argument given.

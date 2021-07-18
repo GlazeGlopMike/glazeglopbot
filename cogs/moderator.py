@@ -29,7 +29,7 @@ class Moderator(commands.Cog):
     @commands.command()
     async def ban(self, ctx):
         """
-        Ban users from the guild.
+        Bans tagged users from the guild.
 
         Requires Ban Users permission.
         """
@@ -68,8 +68,8 @@ class Moderator(commands.Cog):
     @commands.command(aliases=['bo', 'sv', 'stopvid', 'stopvideo'])
     async def blackout(self, ctx):
         """
-        Ends tagged users' streams by moving them to a temporary channel, then  
-        moving them back.
+        Ends tagged users' streams.
+        Achieved by moving them to a temporary channel, then moving them back.
 
         Requires Move Members permission.
         """
@@ -119,8 +119,9 @@ class Moderator(commands.Cog):
     @commands.command(aliases=['dc'])
     async def disconnect(self, ctx):
         """
-        Disconnects tagged users from their voice channels by moving them to a 
-        temporary channel, then deleting that channel.
+        Disconnects tagged users from their voice channels.
+        Achieved by moving them to a temporary channel, then deleting that
+        channel.
 
         Requires Move Members permission.
         """
@@ -166,7 +167,7 @@ class Moderator(commands.Cog):
     @commands.command()
     async def kick(self, ctx):
         """
-        Kicks users from the guild.
+        Kicks tagged users from the guild.
 
         Requires Kick Users permission.
         """
@@ -228,7 +229,8 @@ class Moderator(commands.Cog):
     @commands.command(aliases=['nick'])
     async def nickname(self, ctx, member:discord.Member, *, nick):
         """
-        Changes a user's nickname (the command author's by default).
+        Changes a user's nickname.
+        Changes the command author's nickname if nobody tagged.
 
         Requires Change Nickname permission.
         """
@@ -294,7 +296,7 @@ class Moderator(commands.Cog):
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
         """
-        Moves users to author's voice channel.
+        Moves tagged users to author's voice channel.
 
         Requires Move Members permission.
         """

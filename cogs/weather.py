@@ -147,8 +147,9 @@ class Weather(commands.Cog):
     @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
         """
-        Sends a weather forecast message using OpenWeatherMap data for
-        chosen city and time frame.
+        Sends a weather forecast message.
+        Report generated using OpenWeatherMap data for chosen city and time
+        frame.
                 
         Default location is Toronto, ON and default forecast period is 12h.
         """
@@ -279,8 +280,8 @@ class Weather(commands.Cog):
     @commands.command(aliases=['wr'])
     async def weather(self, ctx, *, place=''):
         """
-        Sends a weather report message using OpenWeatherMap data for
-        chosen city.
+        Sends a weather report message.
+        Report generated using OpenWeatherMap data for chosen city.
                 
         Default location is Toronto, ON.
         """

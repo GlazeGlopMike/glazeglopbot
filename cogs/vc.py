@@ -11,7 +11,7 @@ class VC(commands.Cog):
 
     @commands.command(aliases=['connect'])
     async def join(self, ctx):
-        """Joins the author's voice channel."""
+        """Joins author's voice channel."""
         voice = ctx.author.voice
 
         if not (voice and voice.channel):
@@ -22,7 +22,7 @@ class VC(commands.Cog):
     
     @commands.command()
     async def leave(self, ctx):
-        """Disconnects the bot from its voice channel."""
+        """Disconnects bot from its voice channel."""
         if ctx.guild.voice_client:
             await ctx.guild.voice_client.disconnect()
         else:
@@ -31,7 +31,7 @@ class VC(commands.Cog):
 
     @commands.command()
     async def pause(self, ctx):
-        """Pauses the currently playing sound."""
+        """Pauses currently playing sound."""
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
         if voice:
@@ -47,7 +47,7 @@ class VC(commands.Cog):
 
     @commands.command(aliases=['unpause'])
     async def resume(self, ctx):
-        """Resumes the currently playing sound."""
+        """Resumes currently playing sound."""
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
         if voice:
@@ -64,9 +64,9 @@ class VC(commands.Cog):
     @commands.command()
     async def screech(self, ctx):
         """
-        Plays the REE sound in the current voice channel.
+        Plays 'REE' sound.
 
-        Joins the author's voice channel if not already present.
+        Joins the author's voice channel if not in one.
         Interrupts the current sound if necessary.
         """
         await self.sound(ctx, 'ree')
@@ -74,9 +74,9 @@ class VC(commands.Cog):
     @commands.command(aliases=['snd'])
     async def sound(self, ctx, name='default'):
         """
-        Plays a sound from the sounds directory in the current voice channel.
+        Plays sound from server 'sounds' directory.
 
-        Joins the author's voice channel if not already present.
+        Joins the author's voice channel if not in one.
         Interrupts the current sound if necessary.
         Default sound is 'sounds/default.ogg'.
         """
@@ -107,7 +107,7 @@ class VC(commands.Cog):
 
     @commands.command()
     async def stop(self, ctx):
-        """Stops the currently playing sound."""
+        """Stops currently playing sound."""
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
         if voice:

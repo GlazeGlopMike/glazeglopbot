@@ -39,7 +39,7 @@ async def restart(ctx, *, cog):
 
 @bot.command(name='reloadall', aliases=['rldall'])
 async def reload_all(ctx):
-    """Reloads all DIscord cogs in the directory."""
+    """Reloads all Discord cogs in the directory."""
     failed = []
     
     for path, subdirs, files in os.walk('cogs'):
@@ -55,7 +55,7 @@ async def reload_all(ctx):
     if failed:
         await ctx.send(f"Some cogs not reloaded: {', '.join(failed)}.")
     else:
-        await ctx.send("All cogs reloaded. " + err_msg)
+        await ctx.send("All cogs reloaded.")
 
 @bot.command(name='reloadenv', aliases=['rldenv'])
 async def reload_env(ctx):

@@ -9,8 +9,8 @@ class Litwa(commands.Cog):
 
     def user_chain(users):
         """
-        Accepts a list of Discord Member objects
-        Returns a formatted str listing their tags"
+        Accepts a list of Discord Member objects.
+        Returns a formatted str listing their tags.
         """
         if len(users) == 1:
             return f'{users[0].mention}'
@@ -24,10 +24,7 @@ class Litwa(commands.Cog):
     
     @commands.command()
     async def bontibi(self, ctx):
-        """
-        Accepts a list of Discord Member objects.
-        Greets tagged users, or the command author if none named.
-        """
+        """Greets tagged users, or the command author if none named."""
         mentions = ctx.message.mentions
         
         if mentions:
@@ -46,7 +43,6 @@ class Litwa(commands.Cog):
     @commands.command()
     async def gaeree(self, ctx):
         """
-        Accepts a list of Discord Member objects.
         Insults tagged users, or the command author if none named.
         """
         mentions = ctx.message.mentions
@@ -66,10 +62,7 @@ class Litwa(commands.Cog):
 
     @commands.command()
     async def momtibi(self, ctx):
-        """
-        Accepts a list of Discord Member objects.
-        Insults tagged users' mothers, or the author's if no users named.
-        """
+        """Insults tagged users' mothers, or the author's if no users named."""
         mentions = ctx.message.mentions
         
         if mentions:
@@ -107,7 +100,7 @@ class Litwa(commands.Cog):
     @commands.command(name='1984')
     async def orwell(self, ctx):
         """
-        Deletes the referenced message.
+        Deletes referenced message.
 
         Requires Delete Messages permission.
         """
