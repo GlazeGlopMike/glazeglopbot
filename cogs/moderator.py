@@ -219,7 +219,7 @@ class Moderator(commands.Cog):
         
         if mentions:
             for user in mentions:
-                await user.edit(mute=mute)
+                await user.edit(mute=True)
 
             await ctx.send("Muted user(s).")
         else:
@@ -334,6 +334,29 @@ class Moderator(commands.Cog):
         elif len(ctx.message.content.split()) > 1:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized user mention(s).")
+        else:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("No users mentioned.")
+
+    @commands.command()
+    async def unmute(self, ctx):
+        """
+        Server unmutes a user.
+
+        Requires Mute Users permission.
+        """
+        if not ctx.author.guild_permissions.mute_members:
+            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.send("You lack this authority!")
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            for user in mentions:
+                await user.edit(mute=False)
+
+            await ctx.send("Unmuted user(s).")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("No users mentioned.")
