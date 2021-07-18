@@ -1,10 +1,10 @@
 # GlazeGlopBot
 GlazeGlopBot is a Discord bot intending to convenience members of a private Discord server for the boys. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
-### litwa
+### Litwa
 A small suite of "inside joke" commands for the boys.
 
-### moderator
+### Mod
 Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
 - Muting users
 - Nicknaming users
@@ -13,16 +13,16 @@ Some common guild (server) moderation commands. The command author's server perm
 - Disconnecting users from voice channels
 - Kicking/banning users from guilds
 
-### qr
+### QR
 Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
 
-### rng
+### RNG
 Currently features a dice roller and random integer generator.
 
-### vc
+### VC
 Currently limited to playing local sound files. The cog has basic player functions like stopping, pausing, and resuming.
 
-### weather
+### Weather
 GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://openweathermap.org/). To make location input user-friendly, GlazeGlopBot uses the [Bing Maps API](https://www.bingmapsportal.com/) to resolve natural language inputs into geographic coordinates. The weather cog then makes a OneCall request to OWM, which returns information such as temperature, precipitation, air/wind conditions, and sunrise/sunset times. This data is presented using an embed.
 
 The weather cog can grab:
