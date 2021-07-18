@@ -1,5 +1,5 @@
 # GlazeGlopBot
-GlazeGlopBot is a Discord bot intending to convenience members of a private Discord server for the boys. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
+GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
 ## Cogs
 ### Litwa
@@ -32,7 +32,7 @@ The weather cog can grab:
 - 7-day daily forecast
 
 ## Setup
-Want to run your own instance?
+GlazeGlopBot remains in development and currently serves only a private Discord server for "the boys." Still, you can run your own instance if you'd like!
 
 You can set up your own version of GlazeGlopBot with your own API tokens.
 
