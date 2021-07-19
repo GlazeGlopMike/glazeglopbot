@@ -8,6 +8,7 @@ import pytz
 
 from datetime import datetime
 from discord.ext import commands
+from discord import Embed
 
 def compass_dir(angle):
     """
@@ -165,7 +166,7 @@ def current_weather_embed(obs, loc):
     sunset = datetime.fromtimestamp(w.sunset_time(), tz)
     
     # build embed
-    embed = discord.Embed(title=loc_str)
+    embed = Embed(title=loc_str)
     embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
                     inline=True)
     embed.add_field(name='Feels like', value=f'{feels_like}°C',
@@ -186,8 +187,8 @@ def current_weather_embed(obs, loc):
     embed.add_field(name='Sunset', value=sunset.strftime('%-I:%M %p'),
                     inline=True)
     embed.add_field(name='\u200b', value='\u200b', inline=True)
-    
     embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    
     return embed
 
 def daily_forecast_embed(obs, loc):
@@ -219,13 +220,14 @@ def daily_forecast_embed(obs, loc):
                     f"Night: {night_temp}°C\nPOP: {pop}%")
 
     # build embed
-    embed = discord.Embed(title=loc_str,description='Daily Forecast')
+    embed = Embed(title=loc_str,description='Daily Forecast')
     
     for i in range(8):
         embed.add_field(name=days[i], value=data[i], inline=True)
     
     embed.add_field(name='\u200b', value='\u200b', inline=True)
     embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    
     return embed
 
 def hourly_forecast_embed(obs, loc):
@@ -255,12 +257,70 @@ def hourly_forecast_embed(obs, loc):
         data.append(f"{status_emoji}\n{temp}°C\nPOP: {pop}%")
 
     # build embed
-    embed = discord.Embed(title=loc_str, description='Hourly Forecast')
+    embed = Embed(title=loc_str, description='Hourly Forecast')
 
     for i in range(12):
         embed.add_field(name=hours[i], value=data[i], inline=True)
     
     embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    
+    return embed
+
+def tomorrow_forecast_embed(obs, loc):
+    """
+    Accepts a pyowm OneCall and a geopy Location.
+    Returns an Embed for tomorrow's forecast.
+    """
+    # weather details
+    w = obs.forecast_daily[1]
+    loc_str = loc.raw['address']['formattedAddress']
+    tz = pytz.timezone(obs.timezone)
+    time = datetime.fromtimestamp(obs.current.reference_time(), tz)
+    time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
+    date = datetime.fromtimestamp(w.reference_time(), tz)
+    date_str = date.strftime('%A, %B %-d')
+    
+    t = w.temperature('celsius') # °C
+    day_temp = int(round(t['day'])) # °C
+    status_emoji = weather_emoji(w.weather_code)
+    feels_like = int(round(t['feels_like_day'])) # °C
+    pop = int(round(w.precipitation_probability * 100)) # %
+    
+    morn_temp = int(round(t['morn'])) # °C
+    eve_temp = int(round(t['eve'])) # °C
+    night_temp = int(round(t['night'])) # °C
+    
+    humidity = w.humidity # %
+    uv = round((w.uvi)) # index
+    uv_color = uv_emoji(uv)
+    
+    sunrise = datetime.fromtimestamp(w.sunrise_time(), tz)
+    sunset = datetime.fromtimestamp(w.sunset_time(), tz)
+    
+    # build embed
+    embed = Embed(title=loc_str, description=f'Forecast for {date_str}')
+    embed.add_field(name='At a glance', value=f'{day_temp}°C {status_emoji}',
+                    inline=True)
+    embed.add_field(name='Feels like', value=f'{feels_like}°C',
+                    inline=True)
+    embed.add_field(name='POP', value=f'{pop}%', inline=True)
+    
+    embed.add_field(name='Morning', value=f'{morn_temp}°C', inline=True)
+    embed.add_field(name='Evening', value=f'{eve_temp}°C', inline=True)
+    embed.add_field(name='Night', value=f'{night_temp}°C', inline=True)
+
+    embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
+    embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
+    embed.add_field(name='\u200b', value='\u200b', inline=True)
+    
+    embed.add_field(name='Sunrise', value=sunrise.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='Sunset', value=sunset.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='\u200b', value='\u200b', inline=True)
+    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    
     return embed
 
 class Weather(commands.Cog):
@@ -289,7 +349,8 @@ class Weather(commands.Cog):
                 obs, loc = get_obs_loc(place, 'minutely,daily')
                 await ctx.send(embed=current_weather_embed(obs, loc))
             elif args[0] == '-tmrw' or args[0] == '-tomorrow':
-                pass
+                obs, loc = get_obs_loc(place, 'minutely,hourly')
+                await ctx.send(embed=tomorrow_forecast_embed(obs, loc))
             elif args[0] == '-7d' or args[0] == '-daily':
                 obs, loc = get_obs_loc(place, 'minutely,hourly')
                 await ctx.send(embed=daily_forecast_embed(obs, loc)) 
@@ -322,9 +383,6 @@ class Weather(commands.Cog):
             await ctx.message.add_reaction('\U0001F916');
             await ctx.send("Couldn't perform the API call.")
             print("Search failed: Couldn't find OWM token.")
-        else:
-            print(err)
-            
         
 def setup(bot):
     bot.add_cog(Weather(bot))
