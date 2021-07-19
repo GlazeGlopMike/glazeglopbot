@@ -4,12 +4,12 @@ GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse
 ## Cogs
 ### Mod
 Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
-- Muting users
+- Muting/deafening users
 - Nicknaming users
-- Pinning/unpinning messages
-- Move users across voice channels
+- Pinning messages
+- Moving users across voice channels
 - Disconnecting users from voice channels
-- Kicking/banning users from guilds
+- Kicking/banning users
 
 ### QR
 Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
@@ -82,7 +82,7 @@ You can add your own custom-written cogs to ```cogs``` and load them, as long as
 
 Local cogs can be stored in ```cogs/local``` (create if necessary). These cogs will be loaded on startup and reloaded with ```$rldall```, and can be individually referenced as ```local.[cog]```.
 
-e.g. ```$ld local.ree``` to reload ```cogs/local/ree.py```
+e.g. ```$ld local.ree``` to reload ```cogs/local/ree.py```.
 
 ### Environment File
 Updates to ```.env``` can be applied using ```$rldenv```. See steps 4 to 7 in [Setup](#setup) for more details.
