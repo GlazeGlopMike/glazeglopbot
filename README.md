@@ -2,9 +2,6 @@
 GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
 ## Cogs
-### Litwa
-A small suite of "inside joke" commands for the boys.
-
 ### Mod
 Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
 - Muting users
@@ -28,6 +25,7 @@ GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://op
 
 The weather cog can grab:
 - Current weather
+- Tomorrow's forecast
 - 12-hour hourly forecast
 - 7-day daily forecast
 
@@ -39,19 +37,22 @@ You can set up your own version of GlazeGlopBot with your own API tokens.
 1. Clone the repository.
 ```git clone https://github.com/GlazeGlopMike/glazeglopbot```
 
-2. From the project directory, install dependencies.
+2. Switch to the cloned directory.
+```cd glazeglopbot```
+
+3. Install dependencies.
 ```pip3 install -r requirements.txt```
 
-3. Get your tokens as appropriate.
+4. Get your tokens as appropriate.
 - Discord token: <https://discord.com/developers>
 
 The weather cog also requires:
 - Bing Maps token: <https://www.bingmapsportal.com/>
 - OpenWeatherMap token: <https://openweathermap.org/api>
 
-4. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
+5. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
 
-5. Add the values from steps 3 and 4 into ```.env```. If the file doesn't exist, create one with these contents:
+6. Add the values from steps 3 and 4 into ```.env```. If the file doesn't exist, create one with these contents:
 ```
 DISCORD_TOKEN=[Discord token]
 BING_MAPS_TOKEN=[Bing Maps token]
@@ -59,7 +60,7 @@ OWM_TOKEN=[OpenWeatherMap token]
 FFMPEG_PATH=[FFmpeg path]
 ```
 
-6. Add the bot to your guild using the link assigned to it by Discord.
+7. Add the bot to your guild using the link assigned to it by Discord.
 
 ## Usage
 ### Commands
@@ -68,16 +69,16 @@ Within Discord guilds, the bot responds to commands prefixed with the ```$``` ch
 View the list of commands using ```$help```.
 
 ### Cogs
-All the cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
+All cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
 - ```$ld [cog]``` to load a cog
 - ```$rld [cog]``` to reload a cog
 - ```$rldall``` to reload all cogs
 - ```$uld [cog]``` to unload a cog
 
-You can add your own custom-written cogs to that folder and load them, as long as there are no cog or command naming conflicts.
+You can add your own custom-written cogs to ```cogs``` and load them, as long as there are no cog or command naming conflicts.
 
 ### Environment File
-Updates to ```.env``` can be applied using ```$rldenv```. See steps 3 to 5 in [Setup](#setup) for more details.
+Updates to ```.env``` can be applied using ```$rldenv```. See steps 4 to 7 in [Setup](#setup) for more details.
 
 ### Sound
 OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice channels using ```$sound [name]```. You can add your own too.
@@ -85,4 +86,4 @@ OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice c
 ## Planned Future Additions
 - Music streaming from YouTube
 - Stock summaries
-- Translation between Standard and "Glopesian" English
+- Translation between Standard and Glopesian English
