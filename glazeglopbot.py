@@ -48,7 +48,7 @@ async def reload_all(ctx):
             
             if file[-3:] == '.py':
                 try:
-                    bot.reload_extension('cogs.' + file[:-3])
+                    bot.reload_extension(f'{path.replace("/", ".")}.{cog}')
                 except Exception:
                     failed.append(cog)
 
@@ -105,7 +105,7 @@ for path, subdirs, files in os.walk('cogs'):
             cog = file[:-3]
             
             try:
-                bot.load_extension('cogs.' + cog)
+                bot.load_extension(f'{path.replace("/", ".")}.{cog}')
             except Exception as e:
                 print(f"Failed to load extension '{cog}': {str(e)}")
 
