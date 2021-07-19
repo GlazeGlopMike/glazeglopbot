@@ -51,8 +51,8 @@ def compass_dir(angle):
 
 def get_obs(place='', exclude=''):
     """
-    Accepts a place string and any parts of the One Call data to ignore.
-    Returns a tuple with a PyOWM OneCall object and geopy Location object.
+    Accepts a place string and JSON arguments for One Call data to ignore.
+    Returns a tuple with a PyOWM OneCall and geopy Location.
 
     Default place is Toronto, ON.
 
@@ -68,7 +68,7 @@ def get_obs(place='', exclude=''):
     mgr = owm.weather_manager()
 
     # default place is Toronto, ON
-    if place.strip() == '':
+    if not place.strip():
         place = 'Toronto, ON'
 
     # find location from search string using Bing Maps
@@ -133,6 +133,136 @@ def weather_emoji(code):
     else:
         raise ValueError(f"Unrecognized weather ID: '{code}'.")
 
+def daily_forecast_embed(obs, loc):
+    """
+    Accepts a pyowm OneCall and a geopy Location.
+    Returns an Embed for the 7-day forecast.
+    """
+    # forecast details
+    forecasts = obs.forecast_daily
+    loc_str = loc.raw['address']['formattedAddress']
+    tz = pytz.timezone(obs.timezone)
+    time = datetime.fromtimestamp(obs.current.reference_time(), tz)
+    time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
+    days = []
+    data = []
+
+    for f in forecasts:
+        date = datetime.fromtimestamp(f.reference_time(), tz)
+        date_str = date.strftime('%a %b %-d')
+        t = f.temperature('celsius')
+        day_temp = int(round(t['day'])) # °C
+        night_temp = int(round(t['night'])) # °C
+        status_emoji = weather_emoji(f.weather_code)
+        pop = int(round(f.precipitation_probability * 100)) # -> %
+        
+        days.append(date_str)
+        data.append(f"{status_emoji}\nDay: {day_temp}°C\n"
+                    f"Night: {night_temp}°C\nPOP: {pop}%")
+
+    # build embed
+    embed = discord.Embed(title=loc_str,description='Daily Forecast')
+    
+    for i in range(8):
+        embed.add_field(name=days[i], value=data[i], inline=True)
+    
+    embed.add_field(name='\u200b', value='\u200b', inline=True)
+    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    return embed
+
+def hourly_forecast_embed(obs, loc):
+    """
+    Accepts a pyowm OneCall and a geopy Location.
+    Returns an Embed for the 12-hour forecast.
+    """
+    # forecast details
+    forecasts = obs.forecast_hourly[:13]
+    loc_str = loc.raw['address']['formattedAddress']
+    tz = pytz.timezone(obs.timezone)
+    time = datetime.fromtimestamp(obs.current.reference_time(), tz)
+    time_str = time.strftime('%Y-%m-%d %I:%M %p')
+
+    hours = []
+    data = []
+    
+    for f in forecasts[:-1]:
+        tz = pytz.timezone(obs.timezone)
+        hour = datetime.fromtimestamp(f.reference_time(), tz)
+        hour_str = hour.strftime('%-I %p')
+        temp = int(round(f.temperature('celsius')['temp'])) # °C
+        status_emoji = weather_emoji(f.weather_code)
+        pop = int(round(f.precipitation_probability * 100)) # -> %
+        
+        hours.append(hour_str)
+        data.append(f"{status_emoji}\n{temp}°C\nPOP: {pop}%")
+
+    # build embed
+    embed = discord.Embed(title=loc_str, description='Hourly Forecast')
+
+    for i in range(12):
+        embed.add_field(name=hours[i], value=data[i], inline=True)
+    
+    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    return embed
+
+def current_weather_embed(obs, loc):
+    """
+    Accepts a pyowm OneCall and a geopy Location.
+    Returns an Embed for the weather report.
+    """
+    # weather details
+    w = obs.current
+    loc_str = loc.raw['address']['formattedAddress']
+    tz = pytz.timezone(obs.timezone)
+    time = datetime.fromtimestamp(w.reference_time(), tz)
+    time_str = time.strftime('%Y-%m-%d %I:%M %p')
+    
+    t = w.temperature('celsius') # °C
+    temp = int(round(t['temp'])) # °C
+    status_emoji = weather_emoji(w.weather_code)
+    feels_like = int(round(t['feels_like'])) # °C
+    pop = int(round(obs.forecast_hourly[0].precipitation_probability * 100)) # %
+
+    wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
+    wind_dir = compass_dir(w.wind()['deg']) # °
+    humidity = w.humidity # %
+    uv = round((w.uvi)) # index
+    uv_color = uv_emoji(uv)
+    
+    dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
+    visibility = round(w.visibility_distance / 1000, 1) # m -> km
+    pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
+    
+    sunrise = datetime.fromtimestamp(w.sunrise_time(), tz)
+    sunset = datetime.fromtimestamp(w.sunset_time(), tz)
+    
+    # generate embed
+    embed = discord.Embed(title=loc_str)
+    embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
+                    inline=True)
+    embed.add_field(name='Feels like', value=f'{feels_like}°C',
+                    inline=True)
+    embed.add_field(name='POP', value=f'{pop}%', inline=True)
+    
+    embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
+                    inline=True)
+    embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
+    embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
+    
+    embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
+    embed.add_field(name='Visibility', value=f'{visibility} km', inline=True)
+    embed.add_field(name='Pressure', value=f'{pressure} kPa', inline=True)
+    
+    embed.add_field(name='Sunrise', value=sunrise.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='Sunset', value=sunset.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='\u200b', value='\u200b', inline=True)
+    
+    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    return embed
+
 class Weather(commands.Cog):
     """
     Cog wrapping weather-related commands.
@@ -150,131 +280,24 @@ class Weather(commands.Cog):
         Report generated using OpenWeatherMap data for chosen city and time
         frame.
                 
-        Default location is Toronto, ON and default forecast period is 12h.
+        Default location is Toronto, ON and default forecast period is daily.
         """
         if args:
+            place = ' '.join(args[1:])
+            
             if args[0] == '-12h' or args[0] == '-hourly':
-                # get observation and location information
-                try:
-                    place = ' '.join(args[1:])
-                    obs, loc = get_obs(place, 'minutely,daily')
-                except (AttributeError, geopy.exc.GeocoderQueryError) as e:
-                    await ctx.message.add_reaction('\U0001F615');
-                    await ctx.send(f"Couldn't get a forecast for that "
-                                   "location.")
-                except pyowm.commons.exceptions.UnauthorizedError:
-                    await ctx.message.add_reaction('\U0001F916');
-                    await ctx.send("Couldn't perform the API call.")
-                    print("Search failed: Couldn't find OWM token.")
-
-                forecasts = obs.forecast_hourly[:13]
-                hours = []
-                data = []
-
-                # location details
-                loc_str = loc.raw['address']['formattedAddress']
-
-                # time details
-                tz = pytz.timezone(obs.timezone)
-                current = int(obs.current.reference_time())
-                time = datetime.fromtimestamp(int(current), tz)
-                time_str = time.strftime('%Y-%m-%d %I:%M %p')
-
-                for f in forecasts[:-1]:
-                    # hourly details
-                    tz = pytz.timezone(obs.timezone)
-                    hour = datetime.fromtimestamp(int(f.reference_time()), tz)
-                    hour_str = hour.strftime('%-I %p')
-
-                    # cursory details
-                    temp = int(round(f.temperature('celsius')['temp'])) # °C
-                    status_emoji = weather_emoji(f.weather_code)
-                    pop = int(round(f.precipitation_probability * 100)) # -> %
-
-                    # append data to lists
-                    hours.append(hour_str)
-                    data.append(f"{status_emoji}\n{temp}°C\nPOP: {pop}%")
-
-                # build embed
-                embed = discord.Embed(title=loc_str,
-                                      description='Hourly Forecast')
-
-                # generate embed fields
-                for i in range(len(hours)):
-                    embed.add_field(name=hours[i], value=data[i], inline=True)
-                
-                # add footer
-                embed.set_footer(text=f"Retrieved: {time_str} "
-                                 f"({obs.timezone})")
-                
-                await ctx.send(embed=embed)
+                obs, loc = get_obs(place, 'minutely,daily')
+                await ctx.send(embed=hourly_forecast_embed(obs, loc))
             elif args[0] == '-7d' or args[0] == '-daily':
-                # get observation and location information
-                try:
-                    place = ' '.join(args[1:])
-                    obs, loc = get_obs(place, 'minutely,hourly')
-                except (AttributeError, geopy.exc.GeocoderQueryError) as e:
-                    await ctx.message.add_reaction('\U0001F615');
-                    await ctx.send(f"Couldn't get a forecast for that "
-                                   "location.")
-                except pyowm.commons.exceptions.UnauthorizedError:
-                    await ctx.message.add_reaction('\U0001F916');
-                    await ctx.send("Couldn't perform the API call.")
-                    print("Search failed: Couldn't find OWM token.")
-
-                forecasts = obs.forecast_daily
-                days = []
-                data = []
-
-                # location details
-                loc_str = loc.raw['address']['formattedAddress']
-
-                # time details
-                tz = pytz.timezone(obs.timezone)
-                current = int(obs.current.reference_time())
-                time = datetime.fromtimestamp(int(current), tz)
-                time_str = time.strftime('%Y-%m-%d %I:%M %p')
-
-                for f in forecasts:
-                    # time details
-                    date = datetime.fromtimestamp(int(f.reference_time()), tz)
-                    date_str = date.strftime('%a %b %-d')
-
-                    # cursory details
-                    t = f.temperature('celsius')
-                    day_temp = int(round(t['day'])) # °C
-                    night_temp = int(round(t['night'])) # °C
-                    status_emoji = weather_emoji(f.weather_code)
-                    pop = int(round(f.precipitation_probability * 100)) # -> %
-                    
-                    # append data to lists
-                    days.append(date_str)
-                    data.append(f"{status_emoji}\nDay: {day_temp}°C\n"
-                                f"Night: {night_temp}°C\nPOP: {pop}%")
-
-                # build embed
-                embed = discord.Embed(title=loc_str,description='Daily Forecast')
-
-                # generate embed fields
-                for i in range(len(days)):
-                    embed.add_field(name=days[i], value=data[i], inline=True)
-                    
-                # add blank field for alignment
-                embed.add_field(name='\u200b', value='\u200b', inline=True)
-
-                # add footer
-                embed.set_footer(text=f"Retrieved: {time_str} "
-                                 f"({obs.timezone})")
-                
-                await ctx.send(embed=embed)
+                obs, loc = get_obs(place, 'minutely,hourly')
+                await ctx.send(embed=daily_forecast_embed(obs, loc))         
             elif args[0] == '-current' or args[0] == '-now':
-                place = ' '.join(args[1:])
-                await self.weather(ctx, place=place)
+                obs, loc = get_obs(place, 'minutely,daily')
+                await ctx.send(embed=current_weather_embed(obs, loc))
             else:
-                args = ('-12h',) + args
-                await self.forecast(ctx, *args)
+                await self.forecast(ctx, '-7d', args[0], place)
         else:
-            await self.forecast(ctx, '-12h')
+            await self.forecast(ctx, '-7d')
     
     @commands.command()
     async def weather(self, ctx, *, place=''):
@@ -284,76 +307,22 @@ class Weather(commands.Cog):
                 
         Default location is Toronto, ON.
         """
-        # get observation and location information
-        try:
-            obs, loc = get_obs(place, 'minutely,hourly,daily')
-        except (AttributeError, geopy.exc.GeocoderQueryError) as e:
+        await self.forecast(ctx, '-now', place)
+
+    @forecast.error
+    @weather.error
+    async def forecast_err(self, ctx, err):
+        if isinstance(err, AttributeError) \
+        or isinstance(err, geopy.exc.GeocoderQueryError):
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Couldn't get weather for that location.")
-        except pyowm.commons.exceptions.UnauthorizedError:
+            await ctx.send("Couldn't get a forecast for that location.")
+        elif isinstance(err, pyowm.commons.exceptions.UnauthorizedError):
             await ctx.message.add_reaction('\U0001F916');
             await ctx.send("Couldn't perform the API call.")
             print("Search failed: Couldn't find OWM token.")
-        
-        w = obs.current
-        
-        # location details
-        loc_str = loc.raw['address']['formattedAddress']
-
-        # time details
-        tz = pytz.timezone(obs.timezone)
-        time = datetime.fromtimestamp(int(w.reference_time()), tz)
-        time_str = time.strftime('%Y-%m-%d %I:%M %p')
-
-        # cursory details
-        t = w.temperature('celsius') # °C
-        temp = int(round(t['temp'])) # °C
-        feels_like = int(round(t['feels_like'])) # °C
-        dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-        status_emoji = weather_emoji(w.weather_code)
-
-        # other environmental details
-        humidity = w.humidity # %
-        cloud_cover = w.clouds # %
-        uv = round(float(w.uvi), 1) # index
-        uv_color = uv_emoji(uv)
-        pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
-        visibility = round(w.visibility_distance / 1000, 1) # m -> km
-        wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
-        wind_dir = compass_dir(w.wind()['deg']) # °
-
-        # sun details
-        sunrise = datetime.fromtimestamp(int(w.sunrise_time()), tz)
-        sunset = datetime.fromtimestamp(int(w.sunset_time()), tz)
-        sunrise_str = sunrise.strftime('%-I:%M %p')
-        sunset_str = sunset.strftime('%-I:%M %p')
-
-        # build embed
-        embed = discord.Embed(title=loc_str)
-
-        # generate embed fields
-        embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
-                        inline=True)
-        embed.add_field(name='Feels like', value=f'{feels_like}°C',
-                        inline=True)
-        embed.add_field(name='\u200b', value='\u200b', inline=True)
-        embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
-                        inline=True)
-        embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
-        embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
-        embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
-        embed.add_field(name='Visibility', value=f'{visibility} km',
-                        inline=True)
-        embed.add_field(name='Pressure', value=f'{pressure} kPa', inline=True)
-        embed.add_field(name='Sunrise', value=sunrise_str, inline=True)
-        embed.add_field(name='Sunset', value=sunset_str, inline=True)
-        embed.add_field(name='\u200b', value='\u200b', inline=True)
-
-        # add footer
-        embed.set_footer(text=f"Retrieved: {time_str} "
-                         f"({obs.timezone})")
-
-        await ctx.send(embed=embed)
+        else:
+            print(err)
+            
         
 def setup(bot):
     bot.add_cog(Weather(bot))
