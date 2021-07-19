@@ -49,7 +49,7 @@ def compass_dir(angle):
     elif angle < 348.75:
         return 'NNW'
 
-def get_obs(place='', exclude=''):
+def get_obs_loc(place='', exclude=''):
     """
     Accepts a place string and JSON arguments for One Call data to ignore.
     Returns a tuple with a PyOWM OneCall and geopy Location.
@@ -133,6 +133,63 @@ def weather_emoji(code):
     else:
         raise ValueError(f"Unrecognized weather ID: '{code}'.")
 
+def current_weather_embed(obs, loc):
+    """
+    Accepts a pyowm OneCall and a geopy Location.
+    Returns an Embed for the weather report.
+    """
+    # weather details
+    w = obs.current
+    loc_str = loc.raw['address']['formattedAddress']
+    tz = pytz.timezone(obs.timezone)
+    time = datetime.fromtimestamp(w.reference_time(), tz)
+    time_str = time.strftime('%Y-%m-%d %I:%M %p')
+    
+    t = w.temperature('celsius') # °C
+    temp = int(round(t['temp'])) # °C
+    status_emoji = weather_emoji(w.weather_code)
+    feels_like = int(round(t['feels_like'])) # °C
+    pop = int(round(obs.forecast_hourly[0].precipitation_probability * 100)) # %
+
+    wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
+    wind_dir = compass_dir(w.wind()['deg']) # °
+    humidity = w.humidity # %
+    uv = round((w.uvi)) # index
+    uv_color = uv_emoji(uv)
+    
+    dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
+    visibility = round(w.visibility_distance / 1000, 1) # m -> km
+    pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
+    
+    sunrise = datetime.fromtimestamp(w.sunrise_time(), tz)
+    sunset = datetime.fromtimestamp(w.sunset_time(), tz)
+    
+    # build embed
+    embed = discord.Embed(title=loc_str)
+    embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
+                    inline=True)
+    embed.add_field(name='Feels like', value=f'{feels_like}°C',
+                    inline=True)
+    embed.add_field(name='POP', value=f'{pop}%', inline=True)
+    
+    embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
+                    inline=True)
+    embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
+    embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
+    
+    embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
+    embed.add_field(name='Visibility', value=f'{visibility} km', inline=True)
+    embed.add_field(name='Pressure', value=f'{pressure} kPa', inline=True)
+    
+    embed.add_field(name='Sunrise', value=sunrise.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='Sunset', value=sunset.strftime('%-I:%M %p'),
+                    inline=True)
+    embed.add_field(name='\u200b', value='\u200b', inline=True)
+    
+    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
+    return embed
+
 def daily_forecast_embed(obs, loc):
     """
     Accepts a pyowm OneCall and a geopy Location.
@@ -206,63 +263,6 @@ def hourly_forecast_embed(obs, loc):
     embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
     return embed
 
-def current_weather_embed(obs, loc):
-    """
-    Accepts a pyowm OneCall and a geopy Location.
-    Returns an Embed for the weather report.
-    """
-    # weather details
-    w = obs.current
-    loc_str = loc.raw['address']['formattedAddress']
-    tz = pytz.timezone(obs.timezone)
-    time = datetime.fromtimestamp(w.reference_time(), tz)
-    time_str = time.strftime('%Y-%m-%d %I:%M %p')
-    
-    t = w.temperature('celsius') # °C
-    temp = int(round(t['temp'])) # °C
-    status_emoji = weather_emoji(w.weather_code)
-    feels_like = int(round(t['feels_like'])) # °C
-    pop = int(round(obs.forecast_hourly[0].precipitation_probability * 100)) # %
-
-    wind_speed = round(float(w.wind()['speed']) * 3.6) # m/s -> km/h
-    wind_dir = compass_dir(w.wind()['deg']) # °
-    humidity = w.humidity # %
-    uv = round((w.uvi)) # index
-    uv_color = uv_emoji(uv)
-    
-    dew_point = int(round(w.dewpoint - 273.15)) # K -> °C
-    visibility = round(w.visibility_distance / 1000, 1) # m -> km
-    pressure = round(float(w.pressure['press']) * 0.1, 1) # hPa -> kPa
-    
-    sunrise = datetime.fromtimestamp(w.sunrise_time(), tz)
-    sunset = datetime.fromtimestamp(w.sunset_time(), tz)
-    
-    # generate embed
-    embed = discord.Embed(title=loc_str)
-    embed.add_field(name='At a glance', value=f'{temp}°C {status_emoji}',
-                    inline=True)
-    embed.add_field(name='Feels like', value=f'{feels_like}°C',
-                    inline=True)
-    embed.add_field(name='POP', value=f'{pop}%', inline=True)
-    
-    embed.add_field(name='Wind speed', value=f'{wind_speed} km/h {wind_dir}',
-                    inline=True)
-    embed.add_field(name='Humidity', value=f'{humidity}%', inline=True)
-    embed.add_field(name='UV index', value=f'{uv} {uv_color}', inline=True)
-    
-    embed.add_field(name='Dew point', value=f'{dew_point}°C', inline=True)
-    embed.add_field(name='Visibility', value=f'{visibility} km', inline=True)
-    embed.add_field(name='Pressure', value=f'{pressure} kPa', inline=True)
-    
-    embed.add_field(name='Sunrise', value=sunrise.strftime('%-I:%M %p'),
-                    inline=True)
-    embed.add_field(name='Sunset', value=sunset.strftime('%-I:%M %p'),
-                    inline=True)
-    embed.add_field(name='\u200b', value='\u200b', inline=True)
-    
-    embed.set_footer(text=f"Retrieved: {time_str} ({obs.timezone})")
-    return embed
-
 class Weather(commands.Cog):
     """
     Cog wrapping weather-related commands.
@@ -284,16 +284,18 @@ class Weather(commands.Cog):
         """
         if args:
             place = ' '.join(args[1:])
-            
-            if args[0] == '-12h' or args[0] == '-hourly':
-                obs, loc = get_obs(place, 'minutely,daily')
-                await ctx.send(embed=hourly_forecast_embed(obs, loc))
-            elif args[0] == '-7d' or args[0] == '-daily':
-                obs, loc = get_obs(place, 'minutely,hourly')
-                await ctx.send(embed=daily_forecast_embed(obs, loc))         
-            elif args[0] == '-current' or args[0] == '-now':
-                obs, loc = get_obs(place, 'minutely,daily')
+
+            if args[0] == '-current' or args[0] == '-now':
+                obs, loc = get_obs_loc(place, 'minutely,daily')
                 await ctx.send(embed=current_weather_embed(obs, loc))
+            elif args[0] == '-tmrw' or args[0] == '-tomorrow':
+                pass
+            elif args[0] == '-7d' or args[0] == '-daily':
+                obs, loc = get_obs_loc(place, 'minutely,hourly')
+                await ctx.send(embed=daily_forecast_embed(obs, loc)) 
+            elif args[0] == '-12h' or args[0] == '-hourly':
+                obs, loc = get_obs_loc(place, 'minutely,daily')
+                await ctx.send(embed=hourly_forecast_embed(obs, loc))
             else:
                 await self.forecast(ctx, '-7d', args[0], place)
         else:
