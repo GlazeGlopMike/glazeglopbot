@@ -72,9 +72,10 @@ class VC(commands.Cog):
         await self.sound(ctx, 'ree')
 
     @commands.command(aliases=['snd'])
-    async def sound(self, ctx, name='default'):
+    async def sound(self, ctx, name='default', start=0):
         """
-        Plays sound from server 'sounds' directory.
+        Plays a local sound from the specified timestamp in seconds.
+        Searches for sounds in sounds/[name].ogg
 
         Joins the author's voice channel if not in one.
         Interrupts the current sound if necessary.
@@ -87,6 +88,7 @@ class VC(commands.Cog):
         
         ffmpeg_path = os.getenv('FFMPEG_PATH')
         sound_path = f'sounds/{name}.ogg'
+        ffmpeg_opts = {'options': f'-ss {start}'}
 
         if not os.path.isfile(sound_path):
             await ctx.message.add_reaction('\U0001F615');
@@ -94,7 +96,7 @@ class VC(commands.Cog):
             return
         
         audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
-                                       source=sound_path)
+                                       source=sound_path, **ffmpeg_opts)
         sound = discord.PCMVolumeTransformer(audio)
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
@@ -104,6 +106,12 @@ class VC(commands.Cog):
         
         ctx.voice_client.play(sound)
         await ctx.send(f"Playing '{name}.ogg.'")
+
+    @sound.error
+    async def sound_err(self, ctx, err):
+        if isinstance(err, commands.error.BadArgument):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Unrecognized timestamp.")
 
     @commands.command()
     async def stop(self, ctx):
