@@ -107,7 +107,7 @@ for path, subdirs, files in os.walk('cogs'):
             try:
                 bot.load_extension('cogs.' + cog)
             except Exception as e:
-                print(f"Failed to load extension '{cog}.'")
+                print(f"Failed to load extension '{cog}': {str(e)}")
 
 try:
     bot.run(token)
