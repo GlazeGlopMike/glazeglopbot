@@ -236,7 +236,7 @@ def hourly_forecast_embed(obs, loc):
     Returns an Embed for the 12-hour forecast.
     """
     # forecast details
-    forecasts = obs.forecast_hourly[:13]
+    forecasts = obs.forecast_hourly[:12]
     loc_str = loc.raw['address']['formattedAddress']
     tz = pytz.timezone(obs.timezone)
     time = datetime.fromtimestamp(obs.current.reference_time(), tz)
@@ -245,7 +245,7 @@ def hourly_forecast_embed(obs, loc):
     hours = []
     data = []
     
-    for f in forecasts[:-1]:
+    for f in forecasts:
         tz = pytz.timezone(obs.timezone)
         hour = datetime.fromtimestamp(f.reference_time(), tz)
         hour_str = hour.strftime('%-I %p')
