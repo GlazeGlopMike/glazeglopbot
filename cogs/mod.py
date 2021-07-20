@@ -71,14 +71,17 @@ class Mod(commands.Cog):
         Ends tagged users' streams.
         Achieved by moving them to a temporary channel, then moving them back.
 
-        Requires Move Members permission.
+        Requires Move Members permission, unless used on self.
         """
-        if not ctx.author.guild_permissions.move_members:
+        mentions = ctx.message.mentions
+        
+        if not (len(mentions) == 0 \
+                or len(mentions) == 1 and mentions[0] == ctx.author \
+                or ctx.author.guild_permissions.move_members):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
             return
         
-        mentions = ctx.message.mentions
         temp_channel = await ctx.guild.create_voice_channel('TEMP')
         
         if mentions:
@@ -146,14 +149,17 @@ class Mod(commands.Cog):
         Achieved by moving them to a temporary channel, then deleting that
         channel.
 
-        Requires Move Members permission.
+        Requires Move Members permission, unless used on self.
         """
-        if not ctx.author.guild_permissions.move_members:
+        mentions = ctx.message.mentions
+        
+        if not (len(mentions) == 0 \
+                or len(mentions) == 1 and mentions[0] == ctx.author \
+                or ctx.author.guild_permissions.move_members):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
             return
         
-        mentions = ctx.message.mentions
         temp_channel = await ctx.guild.create_voice_channel('TEMP')
         
         if mentions:
@@ -255,10 +261,10 @@ class Mod(commands.Cog):
         Changes a user's nickname.
         Changes the command author's nickname if nobody tagged.
 
-        Requires Change Nickname permission.
+        Requires Change Nickname permission, unless used on self.
         """
-        if not (member == ctx.author or \
-                ctx.author.guild_permissions.change_nickname):
+        if not (member == ctx.author \
+                or ctx.author.guild_permissions.change_nickname):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
             return
@@ -278,8 +284,8 @@ class Mod(commands.Cog):
 
     @nickname.error
     async def nickname_err(self, ctx, err):
-        if isinstance(err, commands.errors.MemberNotFound) or \
-        isinstance(err, commands.errors.MissingRequiredArgument):
+        if isinstance(err, commands.errors.MemberNotFound) \
+        or isinstance(err, commands.errors.MissingRequiredArgument):
             nick_args = ctx.message.content.split()[1:]
             
             if 'member' in str(err) and not nick_args:
