@@ -128,6 +128,14 @@ class VC(commands.Cog):
         else:
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a voice channel.")
+    
+    async def cog_check(self, ctx):
+        return bool(ctx.guild)
+
+    async def cog_command_error(self, ctx, err):
+        if isinstance(err, commands.errors.CheckFailure):
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send("Not in a guild.")
 
 def setup(bot):
     bot.add_cog(VC(bot))
