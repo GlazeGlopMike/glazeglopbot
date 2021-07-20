@@ -12,30 +12,45 @@ bot = commands.Bot(command_prefix='$')
 
 @bot.command(aliases=['ld'])
 async def load(ctx, *, cog):
-    """Loads a Discord cog."""
+    """
+    Loads a Discord cog.
+    Restarts cog if it's already loaded,
+    """
     try:
         bot.load_extension('cogs.' + cog)
         await ctx.send(f"Loaded cog '{cog}'.")
     except commands.ExtensionError as e:
-        if "already" in str(e): # restart if cog already loaded
+        if "already" in str(e):
             await restart(ctx, cog=cog)
+        elif 'raised an error' in str(e):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Couldn't load '{cog}' due to "
+                           f"{repr(e.__cause__)}.")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reload', aliases=['rld'])
 async def restart(ctx, *, cog):
-    """Reloads a Discord cog."""
-
+    """
+    Reloads a Discord cog.
+    Loads cog if it's not yet loaded."""
     if cog == '-all':
         await reload_all(ctx)
     else:
         try:
             bot.reload_extension('cogs.' + cog)
             await ctx.send(f"Reloaded cog '{cog}'.")
-        except commands.ExtensionError:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("Cog unrecognized or currently inactive.")
+        except commands.ExtensionError as e:
+            if 'has not been' in str(e):
+                await load(ctx, cog=cog)
+            elif 'raised an error' in str(e):
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"Couldn't reload '{cog}' due to "
+                               f"{repr(e.__cause__)}.")
+            else:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reloadall', aliases=['rldall'])
 async def reload_all(ctx):
