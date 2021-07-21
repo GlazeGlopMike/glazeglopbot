@@ -10,6 +10,13 @@ dotenv.load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='$')
 
+@bot.command()
+async def id(ctx):
+    """
+    Sends the bot's ID,
+    """
+    await ctx.send(f"My ID is {bot.user.id}.")
+
 @bot.command(aliases=['ld'])
 async def load(ctx, *, cog):
     """
