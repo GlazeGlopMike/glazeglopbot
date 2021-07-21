@@ -80,9 +80,9 @@ All cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startu
 
 You can add your own custom-written cogs to ```cogs``` and load them, as long as there are no cog or command naming conflicts.
 
-Local cogs can be stored in ```cogs/local``` (create if necessary). These cogs will be loaded on startup and reloaded with ```$rldall```, and can be individually referenced as ```local.[cog]```.
+Cogs stored in subfolders will also be loaded on startup and reloaded with ```$rldall```. These can be individually referenced using ```[subfolder].[cog]```.
 
-e.g. ```$ld local.ree``` to reload ```cogs/local/ree.py```.
+e.g. ```$ld subfolder.example``` to reload ```cogs/subfolder/example.py```.
 
 ### Environment File
 Updates to ```.env``` can be applied using ```$rldenv```. See steps 4 to 7 in [Setup](#setup) for more details.
