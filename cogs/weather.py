@@ -111,24 +111,33 @@ def weather_emoji(code):
     Returns an emoji corresponding to an OpenWeatherMap weather code.
     
     See https://openweathermap.org/weather-conditions
+    Emojis differ from the OpenWeatherMap icons.
     """
+    first = int(code / 100)
+    
     # thunderstorms
-    if int(code / 100) == 2:
+    if first == 2:
         return '\U0001F329'
-    # rain
-    elif int(code / 100) == 3 or int(code / 100) == 5:
+    # shower rain
+    elif first == 3 or first == 5 and code <= 504:
         return '\U0001F327'
+    # rain
+    elif first == 5:
+        return '\U0001F326'
     # snow
-    elif int(code / 100) == 6:
+    elif first == 6:
         return '\u2744'
+    # fog
+    elif first == 7:
+        return '\U0001F32B'
     # sun
     elif code == 800:
         return '\u2600'
     # few clouds
-    elif code >= 801 and code <= 803:
+    elif code == 801:
         return '\u26C5'
     # clouds
-    elif code == 804:
+    elif code >= 802:
         return '\u2601'
     # unrecognized code
     else:
