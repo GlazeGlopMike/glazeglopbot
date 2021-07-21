@@ -10,18 +10,40 @@ dotenv.load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='$')
 
+dev_ids = []
+
+async def is_dev(ctx):
+    """
+    Returns whether user is whitelisted as a developer.
+    Sends error message if user isn't.
+    """
+    status = ctx.author.id in dev_ids
+    
+    if not status:
+        await ctx.message.add_reaction('\U0001F44E');
+        await ctx.send("You lack this authority!")
+    
+    return status
+
+def set_dev_ids():
+    """Loads whitelisted IDs from the DEV_IDS environment variable."""
+    for dev_id in os.getenv('DEV_IDS').split(','):
+        try:
+            dev_ids.append(int(dev_id))
+        except ValueError:
+            print(f"Skipped invalid ID: '{dev_id}'")
+
 @bot.command()
 async def id(ctx):
-    """
-    Sends the bot's ID,
-    """
+    """Sends bot ID."""
     await ctx.send(f"My ID is {bot.user.id}.")
 
 @bot.command(aliases=['ld'])
+@commands.check(is_dev)
 async def load(ctx, *, cog):
     """
     Loads a Discord cog.
-    Restarts cog if it's already loaded,
+    Restarts cog if already loaded,
     """
     try:
         bot.load_extension('cogs.' + cog)
@@ -38,10 +60,12 @@ async def load(ctx, *, cog):
             await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reload', aliases=['rld'])
+@commands.check(is_dev)
 async def restart(ctx, *, cog):
     """
     Reloads a Discord cog.
-    Loads cog if it's not yet loaded."""
+    Loads cog if not yet loaded.
+    """
     if cog == '-all':
         await reload_all(ctx)
     else:
@@ -60,6 +84,7 @@ async def restart(ctx, *, cog):
                 await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reloadall', aliases=['rldall'])
+@commands.check(is_dev)
 async def reload_all(ctx):
     """Reloads all Discord cogs in the directory."""
     failed = []
@@ -68,7 +93,7 @@ async def reload_all(ctx):
         for file in files:
             cog = file[:-3]
             
-            if file[-3:] == '.py':
+            if file.endswith('.py'):
                 try:
                     bot.reload_extension(f'{path.replace("/", ".")}.{cog}')
                 except Exception:
@@ -81,13 +106,16 @@ async def reload_all(ctx):
         await ctx.send("All cogs reloaded.")
 
 @bot.command(name='reloadenv', aliases=['rldenv'])
+@commands.check(is_dev)
 async def reload_env(ctx):
-    """Reloads tokens."""
+    """Reloads tokens and whitelist."""
     dotenv.load_dotenv()
+    set_dev_ids()
 
 @bot.command(aliases=['uld'])
+@commands.check(is_dev)
 async def unload(ctx, *, cog):
-    """Unloads a Discord cog."""
+    """Unloads Discord cog."""
     try:
         bot.unload_extension('cogs.' + cog)
         await ctx.send(f"Unloaded cog '{cog}'.")
@@ -110,27 +138,31 @@ async def load_err(ctx, err):
 async def on_ready():
     """
     Triggered when bot connects to Discord.
-    Writes a simple login message to the console.
+    Prints a login message to the console.
     """
-    print(f"{bot.user} connected to Discord.")
+    print(f"{bot.user} ({bot.user.id}) connected to Discord.")
 
 @bot.event
 async def on_message(message):
-    """Triggered when message sent in active channels."""
-    # ignore messages from self and bots
+    """
+    Triggered when bot sees a new message.
+    Ignores messages from bots.
+    """
     if not message.author == bot.user or message.author.bot:
         await bot.process_commands(message)
 
 # load all cogs in the directory on startup
 for path, subdirs, files in os.walk('cogs'):
     for file in files:
-        if file[-3:] == '.py':
+        if file.endswith('.py'):
             cog = file[:-3]
             
             try:
                 bot.load_extension(f'{path.replace("/", ".")}.{cog}')
             except Exception as e:
                 print(f"Failed to load extension '{cog}': {str(e)}")
+
+set_dev_ids()
 
 try:
     bot.run(token)
