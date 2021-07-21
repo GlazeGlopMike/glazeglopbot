@@ -53,17 +53,20 @@ The weather cog also requires:
 - Bing Maps token: <https://www.bingmapsportal.com/>
 - OpenWeatherMap token: <https://openweathermap.org/api>
 
-5. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
+5. Record your own Discord ID. You can get this by right-clicking on your name in any Discord conversation and clicking ```Copy ID```.
 
-6. Add the values from steps 3 and 4 into ```.env```. If the file doesn't exist, create one with these contents:
+6. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
+
+7. Add the relevant values from steps 4 to 6 into ```.env```. If the file doesn't exist, create one with these contents:
 ```
 DISCORD_TOKEN=[Discord token]
+DEV_IDS=[Discord IDs, comma-separated]
 BING_MAPS_TOKEN=[Bing Maps token]
 OWM_TOKEN=[OpenWeatherMap token]
 FFMPEG_PATH=[FFmpeg path]
 ```
 
-7. Add the bot to your guild using the link assigned to it by Discord.
+8. Add the bot to your guild using the link assigned to it by Discord.
 
 ## Usage
 ### Commands
