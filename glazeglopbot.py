@@ -75,6 +75,7 @@ async def reload_all(ctx):
                     failed.append(cog)
 
     if failed:
+        await ctx.message.add_reaction('\u26A0');
         await ctx.send(f"Some cogs not reloaded: {', '.join(failed)}.")
     else:
         await ctx.send("All cogs reloaded.")
