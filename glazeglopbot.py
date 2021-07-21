@@ -101,7 +101,7 @@ async def load_err(ctx, err):
     """Handles missing arguments by sending an error message."""
     if isinstance(err, commands.errors.MissingRequiredArgument):
         await ctx.message.add_reaction('\U0001F615');
-        await ctx.send(f"Module name required.")
+        await ctx.send("Module name required.")
     else:
         print(err)
 
