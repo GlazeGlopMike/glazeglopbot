@@ -67,9 +67,9 @@ FFMPEG_PATH=[FFmpeg path]
 
 ## Usage
 ### Commands
-Within Discord guilds, the bot responds to commands prefixed with the ```$``` character (e.g. ```$ree```). Users can be passed as arguments by tagging them.
+The bot responds to commands prefixed with the ```$``` character. Users can be passed as arguments by tagging them. View the list of commands using ```$help```.
 
-View the list of commands using ```$help```.
+GlazeGlopBot also responds to direct messages. Most commands implemented for guilds will not work in DMs and some other commands may have reduced functionality.
 
 ### Cogs
 All cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
@@ -90,7 +90,9 @@ Updates to ```.env``` can be applied using ```$rldenv```. See steps 4 to 7 in [S
 ### Sound
 OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice channels using ```$sound [name]```. You can add your own too.
 
-## Planned Future Additions
+## Planned Future Updates
+- Channel-specific permission verification
 - Music streaming from YouTube
+- Restricting cog handling commands to whitelisted Discord IDs
 - Stock summaries
 - Translation between Standard and Glopesian English
