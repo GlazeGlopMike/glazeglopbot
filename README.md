@@ -96,7 +96,6 @@ OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice c
 ## Proposed Features
 - Channel-specific permission verification
 - Music streaming from YouTube
-- Restricting cog handling commands to whitelisted Discord IDs
 - Stock summaries
 - Translation between Standard and Glopesian English
 
