@@ -91,8 +91,12 @@ class VC(commands.Cog):
         ffmpeg_opts = {'options': f'-ss {start}'}
 
         if not os.path.isfile(sound_path):
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("Sound file not found.")
+            if name == 'default':
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("No sound specified.")
+            else:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("Sound file not found.")
             return
         
         audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
@@ -104,7 +108,7 @@ class VC(commands.Cog):
             if voice.is_playing():
                 voice.stop()
         
-        ctx.voice_client.play(sound)
+        voice.play(sound)
         await ctx.send(f"Playing '{name}.ogg.'")
 
     @sound.error

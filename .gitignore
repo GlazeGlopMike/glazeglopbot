@@ -1,4 +1,4 @@
 __pycache__/
-cogs/local/
+*/local/
 .DS_Store
 .env
