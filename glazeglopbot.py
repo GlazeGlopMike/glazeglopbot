@@ -25,7 +25,7 @@ async def is_dev(ctx):
     
     return status
 
-def set_dev_ids():
+def load_dev_ids():
     """Loads whitelisted IDs from the DEV_IDS environment variable."""
     for dev_id in os.getenv('DEV_IDS').split(','):
         try:
@@ -110,7 +110,7 @@ async def reload_all(ctx):
 async def reload_env(ctx):
     """Reloads tokens and whitelist."""
     dotenv.load_dotenv()
-    set_dev_ids()
+    load_dev_ids()
 
 @bot.command(aliases=['uld'])
 @commands.check(is_dev)
@@ -162,7 +162,7 @@ for path, subdirs, files in os.walk('cogs'):
             except Exception as e:
                 print(f"Failed to load extension '{cog}': {str(e)}")
 
-set_dev_ids()
+load_dev_ids()
 
 try:
     bot.run(token)
