@@ -384,8 +384,8 @@ class Weather(commands.Cog):
     @forecast.error
     @weather.error
     async def forecast_err(self, ctx, err):
-        if isinstance(err, AttributeError) \
-        or isinstance(err, geopy.exc.GeocoderQueryError):
+        if (isinstance(err, AttributeError)
+        or isinstance(err, geopy.exc.GeocoderQueryError)):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Couldn't get a forecast for that location.")
         elif isinstance(err, pyowm.commons.exceptions.UnauthorizedError):
