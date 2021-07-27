@@ -3,23 +3,36 @@ import discord
 from discord.ext import commands
 
 def skipped_msg(ctx, members):
-        """
-        Accepts a list of skipped Members.
-        Sends a formatted message listing these users.
-        """
-        if not members:
-            return ''
-        
-        msg = "Skipped: "
-        if len(members) == 1:
-            msg += members[0].name
-        elif len(members) == 2:
-            msg += f'{members[0].name} and {members[1].name}'
-        elif len(members) > 2:
-            for member in members[:-1]:
-                msg += f'{member.name}, '
-            msg += f'and {members[-1].name}'
-        return msg
+    """Returns formatted message listing users."""
+    if not members:
+        return ''
+    
+    msg = "Skipped: "
+    if len(members) == 1:
+        msg += members[0].name
+    elif len(members) == 2:
+        msg += f'{members[0].name} and {members[1].name}'
+    elif len(members) > 2:
+        for member in members[:-1]:
+            msg += f'{member.name}, '
+        msg += f'and {members[-1].name}'
+    return msg
+
+async def validate(ctx, perm, *, guild_only=False, self_use=True):
+    """
+    Returns whether user can use command in context.
+    Sends error message if authorization fails.
+    """
+    if guild_only and not ctx.guild:
+        await ctx.message.add_reaction('\U0001F615')
+        await ctx.send("Not in a guild.")
+        return False
+    elif not getattr(ctx.author.guild_permissions, perm):
+        await ctx.message.add_reaction('\U0001F44E')
+        await ctx.send("You lack this authority.")
+        return False
+
+    return True
 
 class Mod(commands.Cog):
     """Cog wrapping administrative commands."""
@@ -33,9 +46,7 @@ class Mod(commands.Cog):
 
         Requires Ban Users permission.
         """
-        if not ctx.author.guild_permissions.ban_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'ban_members', guild_only=True):
             return
 
         mentions = ctx.message.mentions
@@ -285,6 +296,7 @@ class Mod(commands.Cog):
 
     @nickname.error
     async def nickname_err(self, ctx, err):
+        """Handles argument errors."""
         if (isinstance(err, commands.errors.MemberNotFound)
         or isinstance(err, commands.errors.MissingRequiredArgument)):
             nick_args = ctx.message.content.split()[1:]

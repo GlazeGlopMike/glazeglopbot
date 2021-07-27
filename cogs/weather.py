@@ -12,12 +12,12 @@ from discord import Embed
 
 def compass_dir(angle):
     """
-    Accepts a float angle in [0°,360°).
-    Returns a 16-wind direction abbreviation str.
+    Accepts angle in degrees.
+    Returns 16-wind direction abbreviation.
     """
-    if angle < 0 or angle >= 360:
-        raise ValueError("Bearing not in domain.")
-    elif angle < 11.25 or angle >= 348.75:
+    angle %= 360
+    
+    if angle < 11.25 or angle >= 348.75:
         return 'N'
     elif angle < 33.75:
         return 'NNE'
@@ -50,10 +50,10 @@ def compass_dir(angle):
     elif angle < 348.75:
         return 'NNW'
 
-def get_obs_loc(place='', exclude=''):
+def get_obs_loc(place='', *, exclude=''):
     """
-    Accepts a place string and JSON arguments for One Call data to ignore.
-    Returns a tuple with a PyOWM OneCall and geopy Location.
+    Accepts place and JSON arguments for One Call data to ignore.
+    Returns tuple with PyOWM OneCall and geopy Location.
 
     Default place is Toronto, ON.
 
@@ -81,10 +81,10 @@ def get_obs_loc(place='', exclude=''):
 
 def uv_emoji(uv):
     """
-    Accepts a float UV index value.
-    Returns an emoji corresponding to the risk of harm from UV.
+    Accepts UV index value.
+    Returns colour emoji corresponding to risk of harm.
     
-    See https://openweathermap.org/weather-conditions
+    See https://en.wikipedia.org/wiki/Ultraviolet_index#Index_usage
     """
     # negative values
     if uv < 0:
@@ -107,11 +107,11 @@ def uv_emoji(uv):
 
 def weather_emoji(code):
     """
-    Accepts a weather code integer.
-    Returns an emoji corresponding to an OpenWeatherMap weather code.
+    Accepts weather code integer.
+    Returns emoji corresponding to OpenWeatherMap weather code.
     
     See https://openweathermap.org/weather-conditions
-    Emojis differ from the OpenWeatherMap icons.
+    Emojis differ from OpenWeatherMap icons.
     """
     first = int(code / 100)
     
@@ -145,8 +145,8 @@ def weather_emoji(code):
 
 def current_weather_embed(obs, loc):
     """
-    Accepts a pyowm OneCall and a geopy Location.
-    Returns an Embed for the weather report.
+    Accepts pyowm OneCall and geopy Location.
+    Returns Embed for weather report.
     """
     # weather details
     w = obs.current
@@ -202,8 +202,8 @@ def current_weather_embed(obs, loc):
 
 def daily_forecast_embed(obs, loc):
     """
-    Accepts a pyowm OneCall and a geopy Location.
-    Returns an Embed for the 7-day forecast.
+    Accepts pyowm OneCall and geopy Location.
+    Returns Embed for 7-day forecast.
     """
     # forecast details
     forecasts = obs.forecast_daily
@@ -241,8 +241,8 @@ def daily_forecast_embed(obs, loc):
 
 def hourly_forecast_embed(obs, loc):
     """
-    Accepts a pyowm OneCall and a geopy Location.
-    Returns an Embed for the 12-hour forecast.
+    Accepts pyowm OneCall and geopy Location.
+    Returns Embed for 12-hour forecast.
     """
     # forecast details
     forecasts = obs.forecast_hourly[:12]
@@ -277,8 +277,8 @@ def hourly_forecast_embed(obs, loc):
 
 def tomorrow_forecast_embed(obs, loc):
     """
-    Accepts a pyowm OneCall and a geopy Location.
-    Returns an Embed for tomorrow's forecast.
+    Accepts pyowm OneCall and geopy Location.
+    Returns Embed for tomorrow's forecast.
     """
     # weather details
     w = obs.forecast_daily[1]
@@ -345,7 +345,7 @@ class Weather(commands.Cog):
     @commands.command(aliases=['fc'])
     async def forecast(self, ctx, *args):
         """
-        Sends a weather forecast message.
+        Sends weather forecast message.
         Report generated using OpenWeatherMap data for chosen city and time
         frame.
                 
@@ -374,7 +374,7 @@ class Weather(commands.Cog):
     @commands.command()
     async def weather(self, ctx, *, place=''):
         """
-        Sends a weather report message.
+        Sends weather report message.
         Report generated using OpenWeatherMap data for chosen city.
                 
         Default location is Toronto, ON.
@@ -384,6 +384,7 @@ class Weather(commands.Cog):
     @forecast.error
     @weather.error
     async def forecast_err(self, ctx, err):
+        """Handles search and API errors."""
         if (isinstance(err, AttributeError)
         or isinstance(err, geopy.exc.GeocoderQueryError)):
             await ctx.message.add_reaction('\U0001F615');

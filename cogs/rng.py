@@ -12,11 +12,11 @@ class RNG(commands.Cog):
     @commands.command(name='randint',aliases=['rndint'])
     async def randominteger(self, ctx, a:int=100, b:int=1):
         """
-        Generates a random integer within given bounds (inclusive).
+        Generates random integer within given bounds (inclusive).
         
         Swaps values if given in descending order.
-        Uses 1 as the lower bound one argument given.
-        Uses 1 and 100 as the bounds if no arguments given.
+        Uses 1 as lower bound one argument given.
+        Uses 1 and 100 as bounds if no arguments given.
         """
         if a > b:
             a, b = b, a
@@ -25,7 +25,7 @@ class RNG(commands.Cog):
     
     @commands.command(aliases=['dice','die'])
     async def roll(self, ctx, n:int=6):
-        """Rolls an n-sided die."""
+        """Rolls n-sided die."""
         try:
             await ctx.send(f"Rolled {randint(1, n)}.")
         except ValueError:

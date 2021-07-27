@@ -14,7 +14,7 @@ class QR(commands.Cog):
     @commands.command(aliases=['qr','qrgen'])
     async def makeqr(self, ctx, *, content='sample text'):
         """
-        Sends a QR code image version of the input.
+        Sends QR code image version of input.
 
         Default QR code says "sample text".
         """
