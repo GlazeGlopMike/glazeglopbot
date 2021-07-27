@@ -29,7 +29,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def ban(self, ctx):
         """
-        Bans tagged users from the guild.
+        Bans tagged users from guild.
 
         Requires Ban Users permission.
         """
@@ -69,7 +69,7 @@ class Mod(commands.Cog):
     async def blackout(self, ctx):
         """
         Ends tagged users' streams.
-        Achieved by moving them to a temporary channel, then moving them back.
+        Moves users to temporary channel, then back.
 
         Requires Move Members permission, unless used on self.
         """
@@ -146,15 +146,14 @@ class Mod(commands.Cog):
     async def disconnect(self, ctx):
         """
         Disconnects tagged users from their voice channels.
-        Achieved by moving them to a temporary channel, then deleting that
-        channel.
+        Moves users to temporary channel, then deletes that channel.
 
         Requires Move Members permission, unless used on self.
         """
         mentions = ctx.message.mentions
         
-        if not (len(mentions) == 0 \
-                or len(mentions) == 1 and mentions[0] == ctx.author \
+        if not (len(mentions) == 0
+                or len(mentions) == 1 and mentions[0] == ctx.author
                 or ctx.author.guild_permissions.move_members):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
@@ -196,7 +195,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def kick(self, ctx):
         """
-        Kicks tagged users from the guild.
+        Kicks tagged users from guild.
 
         Requires Kick Members permission.
         """
@@ -235,7 +234,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def mute(self, ctx):
         """
-        Server mutes a user.
+        Server mutes user.
 
         Requires Mute Members permission.
         """
@@ -258,13 +257,15 @@ class Mod(commands.Cog):
     @commands.command(aliases=['nick'])
     async def nickname(self, ctx, member:discord.Member, *, nick):
         """
-        Changes a user's nickname.
-        Changes the command author's nickname if nobody tagged.
+        Changes user's nickname.
+        Changes command author's nickname if nobody tagged.
 
-        Requires Change Nickname permission, unless used on self.
+        Requires Manage Nickname permission if used on others.
+        Requires Change Nickname permission if used on self.
         """
-        if not (member == ctx.author \
-                or ctx.author.guild_permissions.change_nickname):
+        author = ctx.author
+        if not ((member == author and author.guild_permissions.change_nickname)
+                or ctx.author.guild_permissions.manage_nicknames):
             await ctx.message.add_reaction('\U0001F44E');
             await ctx.send("You lack this authority!")
             return
@@ -284,22 +285,22 @@ class Mod(commands.Cog):
 
     @nickname.error
     async def nickname_err(self, ctx, err):
-        if isinstance(err, commands.errors.MemberNotFound) \
-        or isinstance(err, commands.errors.MissingRequiredArgument):
+        if (isinstance(err, commands.errors.MemberNotFound)
+        or isinstance(err, commands.errors.MissingRequiredArgument)):
             nick_args = ctx.message.content.split()[1:]
             
-            if 'member' in str(err) and not nick_args:
+            if 'Member' in str(err) and not nick_args:
                 await ctx.message.add_reaction('\U0001F615');
                 await ctx.send("No user mentioned.")
             elif 'nick' in str(err):
                 await ctx.send("No new nickname provided.")
             else:
-                await self.nickname(ctx, ctx.author, ' '.join(nick_args))
+                await self.nickname(ctx, ctx.author, nick=' '.join(nick_args))
                 
     @commands.command()
     async def pin(self, ctx):
         """
-        Pins the referenced message.
+        Pins referenced message.
 
         Requires Delete Messages permission.
         """
@@ -370,7 +371,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def unmute(self, ctx):
         """
-        Server unmutes a user.
+        Server unmutes user.
 
         Requires Mute Members permission.
         """
@@ -393,7 +394,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def undeafen(self, ctx):
         """
-        Server undeafens a user.
+        Server undeafens user.
 
         Requires Deafen Members permission.
         """
@@ -416,7 +417,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def unpin(self, ctx):
         """
-        Unpins the referenced message.
+        Unpins referenced message.
 
         Requires Delete Messages permission.
         """
