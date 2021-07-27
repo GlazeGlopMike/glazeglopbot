@@ -355,16 +355,16 @@ class Weather(commands.Cog):
             place = ' '.join(args[1:])
 
             if args[0] == '-current' or args[0] == '-now':
-                obs, loc = get_obs_loc(place, 'minutely,daily')
+                obs, loc = get_obs_loc(place, exclude='minutely,daily')
                 await ctx.send(embed=current_weather_embed(obs, loc))
             elif args[0] == '-tmrw' or args[0] == '-tomorrow':
-                obs, loc = get_obs_loc(place, 'minutely,hourly')
+                obs, loc = get_obs_loc(place, exclude='minutely,hourly')
                 await ctx.send(embed=tomorrow_forecast_embed(obs, loc))
             elif args[0] == '-7d' or args[0] == '-daily':
-                obs, loc = get_obs_loc(place, 'minutely,hourly')
+                obs, loc = get_obs_loc(place, exclude='minutely,hourly')
                 await ctx.send(embed=daily_forecast_embed(obs, loc)) 
             elif args[0] == '-12h' or args[0] == '-hourly':
-                obs, loc = get_obs_loc(place, 'minutely,daily')
+                obs, loc = get_obs_loc(place, exclude='minutely,daily')
                 await ctx.send(embed=hourly_forecast_embed(obs, loc))
             else:
                 await self.forecast(ctx, '-7d', args[0], place)
