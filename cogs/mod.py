@@ -18,16 +18,30 @@ def skipped_msg(ctx, members):
         msg += f'and {members[-1].name}'
     return msg
 
-async def validate(ctx, perm, *, guild_only=False, self_use=True):
+def partial_perms_ok(ctx):
+    """
+    Returns whether the user can use command on self without full permissions.
+    True if user doesn't tag anyone or tags themselves only.
+    """
+    mentions = ctx.message.mentions
+    
+    return (len(mentions) == 1 and mentions[0] == ctx.author
+            or not bool(mentions))
+
+async def validate(ctx, perm, *, allow_self=False, guild_only=False):
     """
     Returns whether user can use command in context.
     Sends error message if authorization fails.
+
+    Use on self not allowed by default.
+    Commands allowed in DMs by default.
     """
     if guild_only and not ctx.guild:
         await ctx.message.add_reaction('\U0001F615')
         await ctx.send("Not in a guild.")
         return False
-    elif not getattr(ctx.author.guild_permissions, perm):
+    elif not (getattr(ctx.author.guild_permissions, perm)
+              or partial_perms_ok(ctx)):
         await ctx.message.add_reaction('\U0001F44E')
         await ctx.send("You lack this authority.")
         return False
@@ -63,17 +77,17 @@ class Mod(commands.Cog):
             if not skipped:
                 await ctx.send("All users successfully banned.")
             elif len(skipped) == len(mentions):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No users were banned.")
             else:
-                await ctx.message.add_reaction('\u26A0');
+                await ctx.message.add_reaction('\u26A0')
                 await ctx.send("Some user(s) successfully banned. "
                                f"{skipped_msg(ctx, skipped)}.")
         elif len(ctx.message.content.split()) > 1:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Unrecognized user mention(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("No users mentioned.")
     
     @commands.command(aliases=['bo', 'sv', 'stopvid', 'stopvideo'])
@@ -86,11 +100,8 @@ class Mod(commands.Cog):
         """
         mentions = ctx.message.mentions
         
-        if not (len(mentions) == 0 \
-                or len(mentions) == 1 and mentions[0] == ctx.author \
-                or ctx.author.guild_permissions.move_members):
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'move_members', allow_self=True,
+                              guild_only=True):
             return
         
         temp_channel = await ctx.guild.create_voice_channel('TEMP')
@@ -115,17 +126,17 @@ class Mod(commands.Cog):
             if not skipped:
                 await ctx.send("All video streams successfully stopped.")
             elif len(skipped) == len(mentions):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No video streams were stopped.")
             else:
-                await ctx.message.add_reaction('\u26A0');
+                await ctx.message.add_reaction('\u26A0')
                 await ctx.send("Some video stream(s) successfully moved. "
                                f"{skipped_msg(ctx, skipped)}.")
         elif len(ctx.message.content.split()) > 1:
-                await ctx.message.add_reaction('\U0001F615');
-                await ctx.send("Unrecognized user mention(s).")
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send("Unrecognized user mention(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("No users mentioned.")
 
         await temp_channel.delete()
@@ -137,9 +148,8 @@ class Mod(commands.Cog):
 
         Requires Deafen Members permission.
         """
-        if not ctx.author.guild_permissions.deafen_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'deafen_members', allow_self=True,
+                              guild_only=True):
             return
 
         mentions = ctx.message.mentions
@@ -148,10 +158,10 @@ class Mod(commands.Cog):
             for user in mentions:
                 await user.edit(deafen=True)
 
-            await ctx.send("Deafened user(s).")
+            await ctx.send("Server deafened user(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("No users mentioned.")
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send(f"Server deafened {ctx.author.mention}.")
     
     @commands.command(aliases=['dc'])
     async def disconnect(self, ctx):
@@ -163,11 +173,8 @@ class Mod(commands.Cog):
         """
         mentions = ctx.message.mentions
         
-        if not (len(mentions) == 0
-                or len(mentions) == 1 and mentions[0] == ctx.author
-                or ctx.author.guild_permissions.move_members):
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'move_members', allow_self=True,
+                              guild_only=True):
             return
         
         temp_channel = await ctx.guild.create_voice_channel('TEMP')
@@ -184,21 +191,21 @@ class Mod(commands.Cog):
             if not skipped:
                 await ctx.send("All users successfully disconnected.")
             elif len(skipped) == len(mentions):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No users were disconnected.")
             else:
-                await ctx.message.add_reaction('\u26A0');
+                await ctx.message.add_reaction('\u26A0')
                 await ctx.send("Some user(s) successfully disconnected. "
                                f"{skipped_msg(ctx, skipped)}.")
         elif len(ctx.message.content.split()) > 1:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("Unrecognized user mention(s).")
         else:
             try:
                 await ctx.author.move_to(temp_channel)
                 await ctx.send(f"Disconnected {ctx.author.mention}.")
             except discord.errors.HTTPException:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("You were not in a voice channel.")
         
         await temp_channel.delete()
@@ -210,9 +217,7 @@ class Mod(commands.Cog):
 
         Requires Kick Members permission.
         """
-        if not ctx.author.guild_permissions.kick_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'kick_members', guild_only=True):
             return
 
         mentions = ctx.message.mentions
@@ -229,17 +234,17 @@ class Mod(commands.Cog):
             if not skipped:
                 await ctx.send("All users successfully kicked.")
             elif len(skipped) == len(mentions):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No users were kicked.")
             else:
-                await ctx.message.add_reaction('\u26A0');
+                await ctx.message.add_reaction('\u26A0')
                 await ctx.send("Some user(s) successfully kicked. "
                                f"{skipped_msg(ctx, skipped)}.")
         elif len(ctx.message.content.split()) > 1:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Unrecognized user mention(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("No users mentioned.")
 
     @commands.command()
@@ -249,9 +254,7 @@ class Mod(commands.Cog):
 
         Requires Mute Members permission.
         """
-        if not ctx.author.guild_permissions.mute_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'mute_members', guild_only=True):
             return
 
         mentions = ctx.message.mentions
@@ -260,10 +263,10 @@ class Mod(commands.Cog):
             for user in mentions:
                 await user.edit(mute=True)
 
-            await ctx.send("Muted user(s).")
+            await ctx.send("Server muted user(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("No users mentioned.")
+            await ctx.author.edit(mute=True)
+            await ctx.send(f"Server muted {ctx.author.mention}.")
 
     @commands.command(aliases=['nick'])
     async def nickname(self, ctx, member:discord.Member, *, nick):
@@ -277,7 +280,7 @@ class Mod(commands.Cog):
         author = ctx.author
         if not ((member == author and author.guild_permissions.change_nickname)
                 or ctx.author.guild_permissions.manage_nicknames):
-            await ctx.message.add_reaction('\U0001F44E');
+            await ctx.message.add_reaction('\U0001F44E')
             await ctx.send("You lack this authority!")
             return
 
@@ -285,13 +288,13 @@ class Mod(commands.Cog):
             old_nick = member.nick
             
             if nick == old_nick:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("That's the same name.")
             else:
                 await member.edit(nick=nick)
                 await ctx.send(f"Updated nickname for {member.mention}.")
         except discord.errors.Forbidden:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("I don't have permission to do that.")
 
     @nickname.error
@@ -302,7 +305,7 @@ class Mod(commands.Cog):
             nick_args = ctx.message.content.split()[1:]
             
             if 'Member' in str(err) and not nick_args:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No user mentioned.")
             elif 'nick' in str(err):
                 await ctx.send("No new nickname provided.")
@@ -316,9 +319,7 @@ class Mod(commands.Cog):
 
         Requires Delete Messages permission.
         """
-        if not ctx.author.guild_permissions.manage_messages:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'manage_messages', guild_only=True):
             return
         
         ref = ctx.message.reference
@@ -327,12 +328,12 @@ class Mod(commands.Cog):
             target = await ctx.channel.fetch_message(ref.message_id)
 
             if target.pinned:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("Message already pinned.")
             else:
                 await target.pin()
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send(f"No message referenced.")
 
     @commands.command(aliases=['drag'])
@@ -342,16 +343,14 @@ class Mod(commands.Cog):
 
         Requires Move Members permission.
         """
-        if not ctx.author.guild_permissions.move_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'move_members', guild_only=True):
             return
         
         mentions = ctx.message.mentions
         voice = ctx.author.voice
 
         if not (voice and voice.channel):
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("You're not in a voice channel.")
             return
         
@@ -367,40 +366,17 @@ class Mod(commands.Cog):
             if not skipped:
                 await ctx.send("All users successfully moved.")
             elif len(skipped) == len(mentions):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("No users were moved.")
             else:
-                await ctx.message.add_reaction('\u26A0');
+                await ctx.message.add_reaction('\u26A0')
                 await ctx.send("Some user(s) successfully moved. "
                                f"{skipped_msg(ctx, skipped)}.")
         elif len(ctx.message.content.split()) > 1:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Unrecognized user mention(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("No users mentioned.")
-
-    @commands.command()
-    async def unmute(self, ctx):
-        """
-        Server unmutes user.
-
-        Requires Mute Members permission.
-        """
-        if not ctx.author.guild_permissions.mute_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
-            return
-
-        mentions = ctx.message.mentions
-        
-        if mentions:
-            for user in mentions:
-                await user.edit(mute=False)
-
-            await ctx.send("Unmuted user(s).")
-        else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send("No users mentioned.")
 
     @commands.command()
@@ -410,9 +386,7 @@ class Mod(commands.Cog):
 
         Requires Deafen Members permission.
         """
-        if not ctx.author.guild_permissions.deafen_members:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'deafen_members', guild_only=True):
             return
 
         mentions = ctx.message.mentions
@@ -421,10 +395,31 @@ class Mod(commands.Cog):
             for user in mentions:
                 await user.edit(deafen=False)
 
-            await ctx.send("Undeafened user(s).")
+            await ctx.send("Server undeafened user(s).")
         else:
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("No users mentioned.")
+            await ctx.author.edit(deafen=False)
+            await ctx.send(f"Server undeafened {ctx.author.mention}.")
+
+    @commands.command()
+    async def unmute(self, ctx):
+        """
+        Server unmutes user.
+
+        Requires Mute Members permission.
+        """
+        if not await validate(ctx, 'mute_members', guild_only=True):
+            return
+
+        mentions = ctx.message.mentions
+        
+        if mentions:
+            for user in mentions:
+                await user.edit(mute=False)
+
+            await ctx.send("Server unmuted user(s).")
+        else:
+            await ctx.author.edit(mute=False)
+            await ctx.send(f"Server unmuted {ctx.author.mention}.")
 
     @commands.command()
     async def unpin(self, ctx):
@@ -433,9 +428,7 @@ class Mod(commands.Cog):
 
         Requires Delete Messages permission.
         """
-        if not ctx.author.guild_permissions.manage_messages:
-            await ctx.message.add_reaction('\U0001F44E');
-            await ctx.send("You lack this authority!")
+        if not await validate(ctx, 'manage_messages', guild_only=True):
             return
         
         ref = ctx.message.reference
@@ -447,10 +440,10 @@ class Mod(commands.Cog):
                 await target.unpin()
                 await ctx.send("Message unpinned.")
             else:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("Message not pinned.")
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F615')
             await ctx.send(f"No message referenced.")
     
 def setup(bot):
