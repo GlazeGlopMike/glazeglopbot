@@ -319,7 +319,7 @@ class Mod(commands.Cog):
 
         Requires Delete Messages permission.
         """
-        if not await validate(ctx, 'manage_messages', guild_only=True):
+        if not await validate(ctx, 'manage_messages'):
             return
         
         ref = ctx.message.reference
@@ -332,6 +332,7 @@ class Mod(commands.Cog):
                 await ctx.send("Message already pinned.")
             else:
                 await target.pin()
+                await ctx.send("Message pinned.")
         else:
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send(f"No message referenced.")
@@ -472,7 +473,7 @@ class Mod(commands.Cog):
 
         Requires Delete Messages permission.
         """
-        if not await validate(ctx, 'manage_messages', guild_only=True):
+        if not await validate(ctx, 'manage_messages'):
             return
         
         ref = ctx.message.reference
