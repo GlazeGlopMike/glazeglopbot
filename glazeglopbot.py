@@ -121,6 +121,7 @@ async def reload_env(ctx):
     """Reloads tokens and whitelist."""
     dotenv.load_dotenv()
     load_dev_ids()
+    await ctx.send("Reloaded environment.")
 
 @bot.command(aliases=['uld'])
 @commands.check(is_dev)
