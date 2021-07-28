@@ -52,11 +52,11 @@ async def load(ctx, *, cog):
         if "already" in str(e):
             await restart(ctx, cog=cog)
         elif 'raised an error' in str(e):
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F916');
             await ctx.send(f"Couldn't load '{cog}' due to "
                            f"{repr(e.__cause__)}.")
         else:
-            await ctx.message.add_reaction('\U0001F615');
+            await ctx.message.add_reaction('\U0001F916');
             await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reload', aliases=['rld'])
@@ -76,11 +76,11 @@ async def restart(ctx, *, cog):
             if 'has not been' in str(e):
                 await load(ctx, cog=cog)
             elif 'raised an error' in str(e):
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F916');
                 await ctx.send(f"Couldn't reload '{cog}' due to "
                                f"{repr(e.__cause__)}.")
             else:
-                await ctx.message.add_reaction('\U0001F615');
+                await ctx.message.add_reaction('\U0001F916');
                 await ctx.send("Unrecognized cog.")
 
 @bot.command(name='reloadall', aliases=['rldall'])
@@ -88,20 +88,30 @@ async def restart(ctx, *, cog):
 async def reload_all(ctx):
     """Reloads all Discord cogs in the directory."""
     failed = []
+    walk = os.walk('cogs')
     
-    for path, subdirs, files in os.walk('cogs'):
+    for path, subdirs, files in walk:
         for file in files:
             cog = file[:-3]
             
             if file.endswith('.py'):
                 try:
                     bot.reload_extension(f'{path.replace("/", ".")}.{cog}')
+                except commands.ExtensionError as e:
+                    if 'has not been' in str(e):
+                        bot.load_extension(f'{path.replace("/", ".")}.{cog}')
+                    else:
+                        failed.append(cog)
                 except Exception:
                     failed.append(cog)
 
     if failed:
-        await ctx.message.add_reaction('\u26A0');
-        await ctx.send(f"Some cogs not reloaded: {', '.join(failed)}.")
+        if len(failed) == len(walk):
+            await ctx.message.add_reaction('\U0001F916');
+            await ctx.send("No cogs reloaded.")
+        else:
+            await ctx.message.add_reaction('\u26A0');
+            await ctx.send(f"Some cogs not reloaded: {', '.join(failed)}.")
     else:
         await ctx.send("All cogs reloaded.")
 
