@@ -50,7 +50,7 @@ def compass_dir(angle):
     elif angle < 348.75:
         return 'NNW'
 
-def get_obs_loc(place='', *, exclude=''):
+async def get_obs_loc(place='', *, exclude=''):
     """
     Accepts place and JSON arguments for One Call data to ignore.
     Returns tuple with PyOWM OneCall and geopy Location.
@@ -354,20 +354,33 @@ class Weather(commands.Cog):
         if args:
             place = ' '.join(args[1:])
 
-            if args[0] == '-current' or args[0] == '-now':
-                obs, loc = get_obs_loc(place, exclude='minutely,daily')
-                await ctx.send(embed=current_weather_embed(obs, loc))
-            elif args[0] == '-tmrw' or args[0] == '-tomorrow':
-                obs, loc = get_obs_loc(place, exclude='minutely,hourly')
-                await ctx.send(embed=tomorrow_forecast_embed(obs, loc))
-            elif args[0] == '-7d' or args[0] == '-daily':
-                obs, loc = get_obs_loc(place, exclude='minutely,hourly')
-                await ctx.send(embed=daily_forecast_embed(obs, loc)) 
-            elif args[0] == '-12h' or args[0] == '-hourly':
-                obs, loc = get_obs_loc(place, exclude='minutely,daily')
-                await ctx.send(embed=hourly_forecast_embed(obs, loc))
-            else:
-                await self.forecast(ctx, '-7d', args[0], place)
+            try:
+                if args[0] == '-current' or args[0] == '-now':
+                    obs, loc = await get_obs_loc(place,
+                                                 exclude='minutely,daily')
+                    await ctx.send(embed=current_weather_embed(obs, loc))
+                elif args[0] == '-tmrw' or args[0] == '-tomorrow':
+                    obs, loc = await get_obs_loc(place,
+                                                 exclude='minutely,hourly')
+                    await ctx.send(embed=tomorrow_forecast_embed(obs, loc))
+                elif args[0] == '-7d' or args[0] == '-daily':
+                    obs, loc = await get_obs_loc(place,
+                                                 exclude='minutely,hourly')
+                    await ctx.send(embed=daily_forecast_embed(obs, loc)) 
+                elif args[0] == '-12h' or args[0] == '-hourly':
+                    obs, loc = await get_obs_loc(place,
+                                                 exclude='minutely,daily')
+                    await ctx.send(embed=hourly_forecast_embed(obs, loc))
+                else:
+                    await self.forecast(ctx, '-7d', args[0], place)
+            except geopy.exc.GeocoderAuthenticationFailure:
+                await ctx.message.add_reaction('\U0001F916');
+                await ctx.send("Couldn't geocode due to missing token.")
+                print("Search failed: Need a valid Bing Maps token.")
+            except pyowm.commons.exceptions.UnauthorizedError:
+                await ctx.message.add_reaction('\U0001F916');
+                await ctx.send("Couldn't get weather due to missing token.")
+                print("Search failed: Need a valid OWM token.")
         else:
             await self.forecast(ctx, '-7d')
     
@@ -382,17 +395,12 @@ class Weather(commands.Cog):
         await self.forecast(ctx, '-now', place)
 
     @forecast.error
-    @weather.error
     async def forecast_err(self, ctx, err):
         """Handles search and API errors."""
         if (isinstance(err, AttributeError)
         or isinstance(err, geopy.exc.GeocoderQueryError)):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Couldn't get a forecast for that location.")
-        elif isinstance(err, pyowm.commons.exceptions.UnauthorizedError):
-            await ctx.message.add_reaction('\U0001F916');
-            await ctx.send("Couldn't perform the API call.")
-            print("Search failed: Couldn't find OWM token.")
         
 def setup(bot):
     bot.add_cog(Weather(bot))
