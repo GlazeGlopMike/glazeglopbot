@@ -74,6 +74,13 @@ The bot responds to commands prefixed with the `$` character. Users can be passe
 
 GlazeGlopBot also responds to direct messages. Most commands designed for guilds will not work in DMs and others may have reduced functionality.
 
+### Command Errors
+If execution of your command was unsuccessful, the bot will react to your message. Errors are classified using emojis:
+- :confused: Common errors such as comprehension failure.
+- :warning: Some but not all tasks successful.
+- :thumbsdown: You don't have permission to use the command.
+- :robot: Server-related issue.
+
 ### Cogs
 All cogs (`[cog].py` files) in the `cogs` directory are loaded on startup.
 - `$ld [cog]` to load a cog
@@ -85,7 +92,9 @@ You can add your own custom-written cogs to the `cogs` folder and load them, as 
 
 Cogs stored in subfolders will also be loaded on startup and reloaded with `$rldall`. These can be individually referenced using `[subfolder].[cog]`.
 
-e.g. `$ld subfolder.example` to load `cogs/subfolder/example.py`.
+e.g. `$ld example` to load from `cogs/example.py`
+
+e.g. `$ld subfolder.example` to load from `cogs/subfolder/example.py`.
 
 ### Environment File
 Updates to `.env` can be applied using `$rldenv`. See steps 4 to 7 in [Setup](#setup) for more details.
@@ -93,7 +102,9 @@ Updates to `.env` can be applied using `$rldenv`. See steps 4 to 7 in [Setup](#s
 ### Sound
 OGG files (`[name].ogg`) in the `sounds` folder can be played in voice channels using `$sound [name]`. You can add your own too. Audio files in subfolders can be referenced using `[subfolder]/[name]`.
 
-e.g. `$sound subfolder/sound` to play `sounds/subfolder/sound.ogg`.
+e.g. `$sound example` to play `sounds/example.ogg`
+
+e.g. `$sound subfolder/example` to play `sounds/subfolder/example.ogg`.
 
 ## Proposed Features
 - Streaming from YouTube
