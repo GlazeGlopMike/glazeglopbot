@@ -1,9 +1,9 @@
 # GlazeGlopBot
-GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
+GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into independent [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, local music playing, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
 ## Cogs
 ### Mod
-Some common guild (server) moderation commands. The command author's server permissions are verified before execution.
+Some common guild (server) moderation commands. The command author's permissions are verified before execution.
 - Muting/deafening users
 - Nicknaming users
 - Pinning messages
@@ -57,7 +57,7 @@ The weather cog also requires:
 
 6. If you want to use the vc cog, get [FFmpeg](http://ffmpeg.org/download.html).
 
-7. Add the relevant values from steps 4 to 6 into ```.env```. If the file doesn't exist, create one with these contents:
+7. Add the relevant values from steps 4 to 6 into `.env`. If the file doesn't exist, create one with these contents:
 ```
 DISCORD_TOKEN=[Discord token]
 DEV_IDS=[Discord IDs, comma-separated]
@@ -70,34 +70,35 @@ FFMPEG_PATH=[FFmpeg path]
 
 ## Usage
 ### Commands
-The bot responds to commands prefixed with the ```$``` character. Users can be passed as arguments by tagging them. View the full list of commands using ```$help```.
+The bot responds to commands prefixed with the `$` character. Users can be passed as arguments by tagging them. View the full list of commands using `$help`.
 
-GlazeGlopBot also responds to direct messages. Most commands implemented for guilds will not work in DMs and some other commands may have reduced functionality.
+GlazeGlopBot also responds to direct messages. Most commands designed for guilds will not work in DMs and others may have reduced functionality.
 
 ### Cogs
-All cogs (```[cog].py``` files) in the ```cogs``` directory are loaded on startup.
-- ```$ld [cog]``` to load a cog
-- ```$rld [cog]``` to reload a cog
-- ```$rldall``` to reload all cogs
-- ```$uld [cog]``` to unload a cog
+All cogs (`[cog].py` files) in the `cogs` directory are loaded on startup.
+- `$ld [cog]` to load a cog
+- `$rld [cog]` to reload a cog
+- `$rldall` to reload all cogs
+- `$uld [cog]` to unload a cog
 
-You can add your own custom-written cogs to ```cogs``` and load them, as long as there are no cog or command naming conflicts.
+You can add your own custom-written cogs to the `cogs` folder and load them, as long as there are no cog or command naming conflicts.
 
-Cogs stored in subfolders will also be loaded on startup and reloaded with ```$rldall```. These can be individually referenced using ```[subfolder].[cog]```.
+Cogs stored in subfolders will also be loaded on startup and reloaded with `$rldall`. These can be individually referenced using `[subfolder].[cog]`.
 
-e.g. ```$ld subfolder.example``` to reload ```cogs/subfolder/example.py```.
+e.g. `$ld subfolder.example` to load `cogs/subfolder/example.py`.
 
 ### Environment File
-Updates to ```.env``` can be applied using ```$rldenv```. See steps 4 to 7 in [Setup](#setup) for more details.
+Updates to `.env` can be applied using `$rldenv`. See steps 4 to 7 in [Setup](#setup) for more details.
 
 ### Sound
-OGG files (```[name].ogg```) in the ```sounds``` folder can be played in voice channels using ```$sound [name]```. You can add your own too.
+OGG files (`[name].ogg`) in the `sounds` folder can be played in voice channels using `$sound [name]`. You can add your own too. Audio files in subfolders can be referenced using `[subfolder]/[name]`.
+
+e.g. `$sound subfolder/sound` to play `sounds/subfolder/sound.ogg`.
 
 ## Proposed Features
-- Channel-specific permission verification
-- Music streaming from YouTube
+- Streaming from YouTube
 - Stock summaries
 - Translation between Standard and Glopesian English
 
 ## License
-Available under the MIT License. See ```LICENSE``` for more details.
+Available under the MIT License. See `LICENSE` for more details.

@@ -40,8 +40,8 @@ async def validate(ctx, perm, *, allow_self=False, guild_only=False):
         await ctx.message.add_reaction('\U0001F615')
         await ctx.send("Not in a guild.")
         return False
-    elif not (getattr(ctx.author.guild_permissions, perm)
-              or partial_perms_ok(ctx)):
+    elif ctx.guild and not (getattr(ctx.author.guild_permissions, perm)
+                            or partial_perms_ok(ctx)):
         await ctx.message.add_reaction('\U0001F44E')
         await ctx.send("You lack this authority.")
         return False
@@ -335,6 +335,50 @@ class Mod(commands.Cog):
         else:
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send(f"No message referenced.")
+
+    @commands.command(aliases=['1984', 'del', 'delete'])
+    async def purge(self, ctx, flag='-ref'):
+        """
+        Deletes referenced message or current channel.
+
+        Requires Delete Messages permission to delete messages.
+        Requires Manage Channels permission to delete channels.
+        """
+        msg = ctx.message
+        
+        if flag == '-ref':
+            ref = msg.reference
+            
+            if ref and ref.message_id:
+                target = await ctx.channel.fetch_message(ref.message_id)
+
+                if await validate(ctx, 'manage_messages'):
+                    await target.delete()
+
+                    if ctx.guild:
+                        await msg.delete()
+            else:
+                await ctx.message.add_reaction('\U0001F615')
+                await ctx.send("No target provided.")
+        elif flag == '-bulk':
+            if await validate(ctx, 'manage_messages', guild_only=True):
+                await ctx.channel.purge()
+        elif flag == '-channel':
+            if await validate(ctx, 'manage_channels', guild_only=True):
+                await ctx.channel.delete()
+        elif flag == '-vc':
+            if await validate(ctx, 'manage_channels', guild_only=True):
+                voice = ctx.author.voice
+
+                if voice and voice.channel:
+                    await voice.channel.delete()
+                    await ctx.send("Deleted the voice channel.")
+                else:
+                    await msg.add_reaction('\U0001F44E');
+                    await ctx.send("You're not in a voice channel.")
+        else:
+            await msg.add_reaction('\U0001F44E')
+            await ctx.send("Unrecognized flag.")
 
     @commands.command(aliases=['drag'])
     async def summon(self, ctx):
