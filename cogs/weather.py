@@ -377,6 +377,9 @@ class Weather(commands.Cog):
                 await ctx.message.add_reaction('\U0001F916');
                 await ctx.send("Couldn't geocode due to missing token.")
                 print("Search failed: Need a valid Bing Maps token.")
+            except (AttributeError, geopy.exc.GeocoderQueryError) as e:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send("Couldn't get weather for that location.")
             except pyowm.commons.exceptions.UnauthorizedError:
                 await ctx.message.add_reaction('\U0001F916');
                 await ctx.send("Couldn't get weather due to missing token.")
@@ -393,14 +396,6 @@ class Weather(commands.Cog):
         Default location is Toronto, ON.
         """
         await self.forecast(ctx, '-now', place)
-
-    @forecast.error
-    async def forecast_err(self, ctx, err):
-        """Handles search and API errors."""
-        if (isinstance(err, AttributeError)
-        or isinstance(err, geopy.exc.GeocoderQueryError)):
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("Couldn't get a forecast for that location.")
         
 def setup(bot):
     bot.add_cog(Weather(bot))
