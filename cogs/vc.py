@@ -61,16 +61,6 @@ class VC(commands.Cog):
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a voice channel.")
 
-    @commands.command()
-    async def screech(self, ctx):
-        """
-        Plays 'REE' sound.
-
-        Joins the author's voice channel if not in one.
-        Interrupts the current sound if necessary.
-        """
-        await self.sound(ctx, 'ree')
-
     @commands.command(aliases=['snd'])
     async def sound(self, ctx, name='default', start=0):
         """
