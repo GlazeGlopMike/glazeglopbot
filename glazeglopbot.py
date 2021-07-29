@@ -115,14 +115,6 @@ async def reload_all(ctx):
     else:
         await ctx.send("All cogs reloaded.")
 
-@bot.command(name='reloadenv', aliases=['rldenv'])
-@commands.check(is_dev)
-async def reload_env(ctx):
-    """Reloads tokens and whitelist."""
-    dotenv.load_dotenv()
-    load_dev_ids()
-    await ctx.send("Reloaded environment.")
-
 @bot.command(aliases=['uld'])
 @commands.check(is_dev)
 async def unload(ctx, *, cog):

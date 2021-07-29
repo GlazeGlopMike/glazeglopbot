@@ -96,9 +96,6 @@ e.g. `$ld example` to load from `cogs/example.py`
 
 e.g. `$ld subfolder.example` to load from `cogs/subfolder/example.py`.
 
-### Environment File
-Updates to `.env` can be applied using `$rldenv`. See steps 4 to 7 in [Setup](#setup) for more details.
-
 ### Sound
 OGG files (`[name].ogg`) in the `sounds` folder can be played in voice channels using `$sound [name]`. You can add your own too. Audio files in subfolders can be referenced using `[subfolder]/[name]`.
 
