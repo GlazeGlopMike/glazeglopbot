@@ -7,7 +7,7 @@ from discord.ext import commands
 
 # setting up client
 dotenv.load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
+token = os.environ['DISCORD_TOKEN']
 bot = commands.Bot(command_prefix='$')
 
 dev_ids = []
@@ -27,7 +27,7 @@ async def is_dev(ctx):
 
 def load_dev_ids():
     """Loads whitelisted IDs from the DEV_IDS environment variable."""
-    for dev_id in os.getenv('DEV_IDS').split(','):
+    for dev_id in os.environ['DEV_IDS'].split(','):
         try:
             dev_ids.append(int(dev_id))
         except ValueError:

@@ -65,7 +65,7 @@ async def get_obs_loc(place='', *, exclude=''):
     """
     # set up weather manager
     dotenv.load_dotenv()
-    owm = pyowm.OWM(os.getenv('OWM_TOKEN'))
+    owm = pyowm.OWM(os.environ['OWM_TOKEN'])
     mgr = owm.weather_manager()
 
     # default place is Toronto, ON

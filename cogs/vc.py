@@ -76,7 +76,7 @@ class VC(commands.Cog):
         if not voice:
             await self.join(ctx)
         
-        ffmpeg_path = os.getenv('FFMPEG_PATH')
+        ffmpeg_path = os.environ['FFMPEG_PATH']
         sound_path = f'sounds/{name}.ogg'
         ffmpeg_opts = {'options': f'-ss {start}'}
 
@@ -103,7 +103,7 @@ class VC(commands.Cog):
 
     @sound.error
     async def sound_err(self, ctx, err):
-        if isinstance(err, commands.error.BadArgument):
+        if isinstance(err, commands.errors.BadArgument):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"Unrecognized timestamp.")
 
@@ -125,11 +125,14 @@ class VC(commands.Cog):
     
     async def cog_check(self, ctx):
         return bool(ctx.guild)
-
+        
     async def cog_command_error(self, ctx, err):
         if isinstance(err, commands.errors.CheckFailure):
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a guild.")
+        elif isinstance(err.original, discord.errors.ClientException):
+            await ctx.message.add_reaction('\U0001F916')
+            await ctx.send("Couldn't play sound due to missing dependency.")
 
 def setup(bot):
     bot.add_cog(VC(bot))
