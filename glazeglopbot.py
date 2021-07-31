@@ -1,11 +1,10 @@
 # glazeglopbot.py
 import os
-import discord
 import dotenv
 
 from discord.ext import commands
 
-# setting up client
+# set up client
 dotenv.load_dotenv()
 token = os.environ['DISCORD_TOKEN']
 bot = commands.Bot(command_prefix='$')
@@ -165,8 +164,10 @@ for path, subdirs, files in os.walk('cogs'):
             except Exception as e:
                 print(f"Failed to load extension '{cog}': {str(e)}")
 
+# load developer ids
 load_dev_ids()
 
+# run bot
 try:
     bot.run(token)
 except AttributeError:
