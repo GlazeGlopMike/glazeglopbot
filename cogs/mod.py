@@ -167,7 +167,6 @@ class Mod(commands.Cog):
     async def disconnect(self, ctx):
         """
         Disconnects tagged users from their voice channels.
-        Moves users to temporary channel, then deletes that channel.
 
         Requires Move Members permission, unless used on self.
         """
@@ -177,14 +176,12 @@ class Mod(commands.Cog):
                               guild_only=True):
             return
         
-        temp_channel = await ctx.guild.create_voice_channel('TEMP')
-        
         if mentions:
             skipped = []
             
             for user in mentions:
                 try:
-                    await user.move_to(temp_channel)
+                    await user.move_to(None)
                 except discord.errors.HTTPException:
                     skipped.append(user)
 
@@ -202,13 +199,11 @@ class Mod(commands.Cog):
                 await ctx.send("Unrecognized user mention(s).")
         else:
             try:
-                await ctx.author.move_to(temp_channel)
+                await ctx.author.move_to(None)
                 await ctx.send(f"Disconnected {ctx.author.mention}.")
             except discord.errors.HTTPException:
                 await ctx.message.add_reaction('\U0001F615')
                 await ctx.send("You were not in a voice channel.")
-        
-        await temp_channel.delete()
 
     @commands.command()
     async def kick(self, ctx):
@@ -336,12 +331,38 @@ class Mod(commands.Cog):
         else:
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send(f"No message referenced.")
+    
+    @commands.command()
+    async def profile(self, ctx, member:discord.Member):
+        """Profiles user."""
+        if not await validate(ctx, 'send_messages', guild_only=True):
+            return
+        
+        joined = member.joined_at
+        join_str = joined.strftime('%Y-%m-%d') if joined else '--'
+        roles = [role.name for role in member.roles[1:]]
+        highest_role = roles[-1] if roles else '--'
+        other_roles = ', '.join(roles[:-1]) if len(roles) > 1 else '--'
+
+        if member.guild_permissions.administrator:
+            title = 'Guild Administrator'
+        else:
+            title = 'Guild Member'
+        
+        embed = discord.Embed(title=f'{member} ({member.nick})',
+                              description=title)
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.add_field(name='ID', value=member.id, inline=False)
+        embed.add_field(name='Joined Guild', value=join_str, inline=True)
+        embed.add_field(name='Highest Role', value=highest_role, inline=True)
+        embed.add_field(name='Other Roles', value=other_roles, inline=False)
+        
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['1984', 'del', 'delete'])
     async def purge(self, ctx, flag='-ref'):
         """
         Deletes referenced message or current channel.
-
         Requires Delete Messages permission to delete messages.
         Requires Manage Channels permission to delete channels.
         """
@@ -380,8 +401,8 @@ class Mod(commands.Cog):
         else:
             await msg.add_reaction('\U0001F44E')
             await ctx.send("Unrecognized flag.")
-
-    @commands.command(aliases=['drag'])
+    
+    @commands.command(aliases=['','drag'])
     async def summon(self, ctx):
         """
         Moves tagged users to author's voice channel.
