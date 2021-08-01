@@ -122,6 +122,32 @@ class VC(commands.Cog):
         else:
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a voice channel.")
+
+    @commands.command(aliases=['vol'])
+    async def volume(self, ctx, level:int):
+        """Adjusts volume of current sound."""
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+        if voice:
+            if voice.is_playing():
+                if 0 <= level <= 200:
+                    voice.source.volume = level / 100
+                    await ctx.send(f"Adjusted volume to {level}%.")
+            else:
+                await ctx.message.add_reaction('\U0001F615')
+                await ctx.send("Not playing anything right now.")
+        else:
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send("Not in a voice channel.")
+
+    @volume.error
+    async def volume_err(self, ctx, err):
+        if isinstance(err, commands.errors.BadArgument):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("Volume must be between 0 and 200.")
+        elif isinstance(err, commands.errors.MissingRequiredArgument):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("No volume specified.")
     
     async def cog_check(self, ctx):
         return bool(ctx.guild)
@@ -130,7 +156,8 @@ class VC(commands.Cog):
         if isinstance(err, commands.errors.CheckFailure):
             await ctx.message.add_reaction('\U0001F615')
             await ctx.send("Not in a guild.")
-        elif isinstance(err.original, discord.errors.ClientException):
+        elif (isinstance(err, commands.ConversionError)
+                and isinstance(err.original, discord.errors.ClientException)):
             await ctx.message.add_reaction('\U0001F916')
             await ctx.send("Couldn't play sound due to missing dependency.")
 
