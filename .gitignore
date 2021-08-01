@@ -2,4 +2,3 @@ __pycache__/
 */local/
 .DS_Store
 .env
-Procfile
