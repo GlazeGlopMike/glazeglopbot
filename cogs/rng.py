@@ -1,5 +1,6 @@
 # rng.py
 import discord
+import random
 
 from discord.ext import commands
 from random import randint
@@ -42,6 +43,16 @@ class RNG(commands.Cog):
         elif isinstance(err, commands.errors.MissingRequiredArgument):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Need an upper bound.")
+
+    @commands.command(aliases=['ht', 'flip'])
+    async def toss(self, ctx, n:int=6):
+        """Flips a coin."""
+        try:
+            result = 'heads' if random.random() < 0.5 else 'tails'
+            await ctx.send(f"Landed {result}.")
+        except ValueError:
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send("Need a positive integer bound.")
     
 def setup(bot):
     bot.add_cog(RNG(bot))
