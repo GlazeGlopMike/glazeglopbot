@@ -396,10 +396,10 @@ class Mod(commands.Cog):
                     await voice.channel.delete()
                     await ctx.send("Deleted the voice channel.")
                 else:
-                    await msg.add_reaction('\U0001F44E');
+                    await msg.add_reaction('\U0001F615');
                     await ctx.send("You're not in a voice channel.")
         else:
-            await msg.add_reaction('\U0001F44E')
+            await msg.add_reaction('\U0001F615')
             await ctx.send("Unrecognized flag.")
     
     @commands.command(aliases=['','drag'])

@@ -18,7 +18,7 @@ Some common guild (server) moderation commands. The command author's permissions
 Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
 
 ### RNG
-Currently features a dice roller and random integer generator.
+Currently features a coin tosser, dice roller and random integer generator.
 
 ### VC
 Currently limited to playing local sound files. The cog has basic player functions like stopping, pausing, and resuming.
