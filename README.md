@@ -1,6 +1,8 @@
 # GlazeGlopBot
 GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into independent [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, local music playing, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
+On Discord: [@GlazeGlopBot#7510](https://discordapp.com/users/844640688900407327)
+
 ## Cogs
 ### Mod
 Some common guild (server) moderation commands. The command author's permissions are verified before execution.
