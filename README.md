@@ -6,10 +6,11 @@ GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse
 Some common guild (server) moderation commands. The command author's permissions are verified before execution.
 - Muting/deafening users
 - Nicknaming users
-- Pinning messages
 - Moving users across voice channels
 - Disconnecting users from voice channels
 - Kicking/banning users
+- Pinning messages
+- Writing user summaries
 
 ### QR
 Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
@@ -60,10 +61,10 @@ The weather cog also requires:
 7. Add the relevant values from steps 4 to 6 into `.env`. If the file doesn't exist, create one with these contents:
 ```
 DISCORD_TOKEN=[Discord token]
-DEV_IDS=[Discord IDs, comma-separated]
 BING_MAPS_TOKEN=[Bing Maps token]
 OWM_TOKEN=[OpenWeatherMap token]
 FFMPEG_PATH=[FFmpeg path]
+DEV_IDS=[Discord IDs, comma-separated]
 ```
 
 8. Add the bot to your guild using the link assigned to it by Discord.
@@ -102,6 +103,8 @@ OGG files (`[name].ogg`) in the `sounds` folder can be played in voice channels 
 e.g. `$sound example` to play `sounds/example.ogg`
 
 e.g. `$sound subfolder/example` to play `sounds/subfolder/example.ogg`.
+
+A number of my personal compositions are provided as sample sounds. Hope you like them!
 
 ## Proposed Features
 - Streaming from YouTube
