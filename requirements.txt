@@ -5,3 +5,4 @@ pypng
 pyqrcode
 python-dotenv
 pytz
+youtube-dl
