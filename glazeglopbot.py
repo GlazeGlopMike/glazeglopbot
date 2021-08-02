@@ -172,4 +172,3 @@ try:
     bot.run(token)
 except AttributeError:
     print("Launch failed: Couldn't find the Discord token.")
-
