@@ -2,7 +2,7 @@
 ## Table of Contents
 - [About](#about)
 - [Setup](#setup)
-- [Usage]($usage)
+- [Usage](#usage)
   - [Commands](#commands)
   - [Command Errors](#command-errors)
   - [Cog Management](#cog-management)
