@@ -144,7 +144,7 @@ class Mod(commands.Cog):
     @commands.command()
     async def deafen(self, ctx):
         """
-        Server deafens a user.
+        Server deafens user.
 
         Requires Deafen Members permission.
         """
@@ -203,7 +203,7 @@ class Mod(commands.Cog):
                 await ctx.send(f"Disconnected {ctx.author.mention}.")
             except discord.errors.HTTPException:
                 await ctx.message.add_reaction('\U0001F615')
-                await ctx.send("You were not in a voice channel.")
+                await ctx.send("You're not in a voice channel.")
 
     @commands.command()
     async def kick(self, ctx):

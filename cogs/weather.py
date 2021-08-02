@@ -119,7 +119,7 @@ def weather_emoji(code):
     if first == 2:
         return '\U0001F329'
     # shower rain
-    elif first == 3 or first == 5 and code <= 504:
+    elif first == 3 or 500 <= code <= 504:
         return '\U0001F327'
     # rain
     elif first == 5:

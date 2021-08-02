@@ -16,8 +16,14 @@ class VC(commands.Cog):
         voice = ctx.author.voice
 
         if voice and voice.channel:
-            await voice.channel.connect()
-            await ctx.send("Joined voice channel.")
+            channel = voice.channel
+            
+            try:
+                await channel.connect()
+            except discord.errors.ClientException:
+                await ctx.guild.get_member(self.bot.user.id).move_to(channel)   
+            
+            await ctx.send(f"Joined `{channel.name}`.")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("You're not in a voice channel.")
@@ -75,6 +81,13 @@ class VC(commands.Cog):
         Default sound is 'sounds/default.ogg'.
         Starts at beginning by default.
         """
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+        
+        if not (ctx.author.voice or voice):
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send("Not in a voice channel.")
+            return
+        
         ffmpeg_path = os.environ['FFMPEG_PATH']
         sound_path = f'sounds/{name}.ogg'
         ffmpeg_opts = {'options': f'-ss {start}'}
@@ -91,8 +104,6 @@ class VC(commands.Cog):
         audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
                                        source=sound_path, **ffmpeg_opts)
         sound = discord.PCMVolumeTransformer(audio)
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
-
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
         
         if not voice:
@@ -161,13 +172,18 @@ class VC(commands.Cog):
         Joins author's voice channel if not in one.
         Interrupts current sound if necessary.
         """
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+        if not (ctx.author.voice or voice):
+            await ctx.message.add_reaction('\U0001F615')
+            await ctx.send("Not in a voice channel.")
+            return
+        
         YDL_OPTS = {'format': 'bestaudio', 'noplaylist': 'True'}
         FFMPEG_OPTS = {'before_options': '-reconnect 1 -reconnect_streamed 1 '
                        '-reconnect_delay_max 5',
                        'options': '-vn'}
-
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
-
+        
         with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
             info = (ydl.extract_info(f'ytsearch:{url}', download=False)
                     ['entries'][0])
@@ -195,7 +211,7 @@ class VC(commands.Cog):
             await ctx.send(f"No URL provided.")
         elif isinstance(err, youtube_dl.utils.DownloadError):
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Invalid YouTube URL.")
+            await ctx.send(f"Couldn't download the video.")
     
     async def cog_check(self, ctx):
         return bool(ctx.guild)
@@ -208,6 +224,8 @@ class VC(commands.Cog):
                 and isinstance(err.original, discord.errors.ClientException)):
             await ctx.message.add_reaction('\U0001F916')
             await ctx.send("Couldn't play sound due to missing dependency.")
+        else:
+            print(err)
 
 def setup(bot):
     bot.add_cog(VC(bot))

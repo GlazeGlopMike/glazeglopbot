@@ -1,5 +1,6 @@
 # glazeglopbot.py
 import os
+import discord
 import dotenv
 
 from discord.ext import commands
@@ -171,4 +172,6 @@ load_dev_ids()
 try:
     bot.run(token)
 except AttributeError:
-    print("Launch failed: Couldn't find the Discord token.")
+    print("Login failed: Couldn't find the Discord token.")
+except discord.errors.LoginFailure:
+    print("Login failed: Invalid Discord token.")
