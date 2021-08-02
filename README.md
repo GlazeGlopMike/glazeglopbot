@@ -21,7 +21,7 @@ Generates and sends a QR code image using the [pyqrcode](https://pypi.org/projec
 Currently features a coin tosser, dice roller and random integer generator.
 
 ### VC
-Currently limited to playing local sound files. The cog has basic player functions like stopping, pausing, and resuming.
+Plays sounds from local OGG files or from YouTube. The cog has basic player functions like pausing, resuming, and stopping.
 
 ### Weather
 GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://openweathermap.org/). To make location input user-friendly, GlazeGlopBot uses the [Bing Maps API](https://www.bingmapsportal.com/) to resolve natural language inputs into geographic coordinates. The weather cog then makes a OneCall request to OWM, which returns information such as temperature, precipitation, air/wind conditions, and sunrise/sunset times. This data is presented using an embed.
@@ -99,7 +99,7 @@ e.g. `$ld example` to load from `cogs/example.py`
 
 e.g. `$ld subfolder.example` to load from `cogs/subfolder/example.py`.
 
-### Sound
+### Local Sound Files
 OGG files (`[name].ogg`) in the `sounds` folder can be played in voice channels using `$sound [name]`. You can add your own too. Audio files in subfolders can be referenced using `[subfolder]/[name]`.
 
 e.g. `$sound example` to play `sounds/example.ogg`
@@ -109,7 +109,7 @@ e.g. `$sound subfolder/example` to play `sounds/subfolder/example.ogg`.
 A number of my personal compositions are provided as sample sounds. Hope you like them!
 
 ## Proposed Features
-- Streaming from YouTube
+- Sound queue system
 - Stock summaries
 - Translation between Standard and Glopesian English
 
