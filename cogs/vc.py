@@ -14,17 +14,19 @@ class VC(commands.Cog):
         """Joins author's voice channel."""
         voice = ctx.author.voice
 
-        if not (voice and voice.channel):
+        if voice and voice.channel:
+            await voice.channel.connect()
+            await ctx.send("Joined voice channel.")
+        else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("You're not in a voice channel.")
-        else:
-            await voice.channel.connect()
     
     @commands.command()
     async def leave(self, ctx):
         """Disconnects bot from its voice channel."""
         if ctx.guild.voice_client:
             await ctx.guild.voice_client.disconnect()
+            await ctx.send("Left voice channel.")
         else:
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("Not in a voice channel.")
@@ -105,7 +107,7 @@ class VC(commands.Cog):
     async def sound_err(self, ctx, err):
         if isinstance(err, commands.errors.BadArgument):
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Unrecognized timestamp.")
+            await ctx.send(f"Invalid timestamp.")
 
     @commands.command()
     async def stop(self, ctx):
