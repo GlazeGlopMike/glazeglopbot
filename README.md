@@ -17,7 +17,7 @@
 - [License](#license)
 
 ## About
-GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into independent [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, local music playing, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
+GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Commands are organized into independent [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, local music playing, (pseudo)random number generation, QR code generation, and forecast utilities have been implemented.
 
 On Discord: [@GlazeGlopBot#7510](https://discordapp.com/users/844640688900407327)
 
@@ -62,12 +62,12 @@ DEV_IDS=[Discord IDs, comma-separated]
 
 ## Usage
 ### Commands
-The bot responds to commands prefixed with the `$` character. Users can be passed as arguments by tagging them. View the full list of commands using `$help`.
+GlazeGlopBot responds to commands prefixed by `$`. Users can be passed as arguments by tagging them. View the full list of commands using `$help`.
 
 GlazeGlopBot also responds to direct messages. Most commands designed for guilds will not work in DMs and others may have reduced functionality.
 
 ### Command Errors
-If execution of your command was unsuccessful, the bot will react to your message. Errors are classified using emojis:
+If execution of your command was unsuccessful, GlazeGlopBot will react to your message. Errors are classified using emojis:
 - :confused: Common errors such as comprehension failure.
 - :warning: Some but not all tasks successful.
 - :thumbsdown: You don't have permission to use the command.
@@ -95,7 +95,7 @@ e.g. `$sound example` to play `sounds/example.ogg`
 
 e.g. `$sound subfolder/example` to play `sounds/subfolder/example.ogg`.
 
-A number of my personal compositions are provided as sample sounds. Hope you like them!
+A number of my personal compositions are provided as sample sounds. Hope you enjoy them!
 
 ## Cogs
 ### Mod
