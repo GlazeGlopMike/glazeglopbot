@@ -1,36 +1,8 @@
 # GlazeGlopBot
+## About
 GlazeGlopBot is an all-purpose Discord bot written in Python featuring a diverse collection of practical utilities. Fundamentally, commands are organized into independent [discord.py](https://discordpy.readthedocs.io/en/stable/) cogs. Currently, guild moderation, local music playing, (pseudo)random number generation, QR code generation, and weather reporting utilities have been implemented.
 
 On Discord: [@GlazeGlopBot#7510](https://discordapp.com/users/844640688900407327)
-
-## Cogs
-### Mod
-Some common guild (server) moderation commands. The command author's permissions are verified before execution.
-- Muting/deafening users
-- Nicknaming users
-- Moving users across voice channels
-- Disconnecting users from voice channels
-- Kicking/banning users
-- Pinning messages
-- Writing user summaries
-
-### QR
-Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
-
-### RNG
-Currently features a coin tosser, dice roller and random integer generator.
-
-### VC
-Plays sounds from local OGG files or from YouTube. The cog has basic player functions like pausing, resuming, and stopping.
-
-### Weather
-GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://openweathermap.org/). To make location input user-friendly, GlazeGlopBot uses the [Bing Maps API](https://www.bingmapsportal.com/) to resolve natural language inputs into geographic coordinates. The weather cog then makes a OneCall request to OWM, which returns information such as temperature, precipitation, air/wind conditions, and sunrise/sunset times. This data is presented using an embed.
-
-The weather cog can grab:
-- Current weather
-- Tomorrow's forecast
-- 12-hour hourly forecast
-- 7-day daily forecast
 
 ## Setup
 GlazeGlopBot remains in development and currently serves only a private Discord server for "the boys." Still, you can run your own instance if you'd like!
@@ -84,7 +56,7 @@ If execution of your command was unsuccessful, the bot will react to your messag
 - :thumbsdown: You don't have permission to use the command.
 - :robot: Server-related issue.
 
-### Cogs
+### Cog Management
 All cogs (`[cog].py` files) in the `cogs` directory are loaded on startup.
 - `$ld [cog]` to load a cog
 - `$rld [cog]` to reload a cog
@@ -108,10 +80,39 @@ e.g. `$sound subfolder/example` to play `sounds/subfolder/example.ogg`.
 
 A number of my personal compositions are provided as sample sounds. Hope you like them!
 
+## Cogs
+### Mod
+Some common guild (server) moderation commands. The command author's permissions are verified before execution.
+- Muting/deafening users
+- Nicknaming users
+- Moving users across voice channels
+- Disconnecting users from voice channels
+- Kicking/banning users
+- Pinning messages
+- Writing user summaries
+
+### QR
+Generates and sends a QR code image using the [pyqrcode](https://pypi.org/project/PyQRCode/) module.
+
+### RNG
+Currently features a coin tosser, dice roller and random integer generator.
+
+### VC
+Plays sounds from local OGG files or from YouTube. The cog has basic player functions like pausing, resuming, and stopping.
+
+### Weather
+GlazeGlopBot grabs weather data through API calls to [OpenWeatherMap](https://openweathermap.org/). To make location input user-friendly, GlazeGlopBot uses the [Bing Maps API](https://www.bingmapsportal.com/) to resolve natural language inputs into geographic coordinates. The weather cog then makes a OneCall request to OWM, which returns information such as temperature, precipitation, air/wind conditions, and sunrise/sunset times. This data is presented using an embed.
+
+The weather cog can grab:
+- Current weather
+- Tomorrow's forecast
+- 12-hour hourly forecast
+- 7-day daily forecast
+
 ## Proposed Features
 - Sound queue system
 - Stock summaries
-- Translation between Standard and Glopesian English
+- Standard ↔ Glopesian English translation
 
 ## License
 Available under the MIT License. See `LICENSE` for more details.
