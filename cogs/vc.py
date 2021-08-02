@@ -1,6 +1,7 @@
 # vc.py
-import discord
 import os
+import discord
+import youtube_dl
 
 from discord.ext import commands
 
@@ -66,18 +67,14 @@ class VC(commands.Cog):
     @commands.command(aliases=['snd'])
     async def sound(self, ctx, name='default', start=0):
         """
-        Plays a local sound from the specified timestamp in seconds.
-        Searches for sounds in sounds/[name].ogg
+        Plays local sound from timestamp in seconds.
+        Searches for sound 'sounds/[name].ogg'.
 
-        Joins the author's voice channel if not in one.
-        Interrupts the current sound if necessary.
+        Joins author's voice channel if not in one.
+        Interrupts current sound if necessary.
         Default sound is 'sounds/default.ogg'.
+        Starts at beginning by default.
         """
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
-        
-        if not voice:
-            await self.join(ctx)
-        
         ffmpeg_path = os.environ['FFMPEG_PATH']
         sound_path = f'sounds/{name}.ogg'
         ffmpeg_opts = {'options': f'-ss {start}'}
@@ -96,12 +93,17 @@ class VC(commands.Cog):
         sound = discord.PCMVolumeTransformer(audio)
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+        
+        if not voice:
+            await self.join(ctx)
+
         if voice:
             if voice.is_playing():
                 voice.stop()
         
         voice.play(sound)
-        await ctx.send(f"Playing '{name}.ogg.'")
+        await ctx.send(f"Playing `{name}.ogg`.")
 
     @sound.error
     async def sound_err(self, ctx, err):
@@ -146,10 +148,54 @@ class VC(commands.Cog):
     async def volume_err(self, ctx, err):
         if isinstance(err, commands.errors.BadArgument):
             await ctx.message.add_reaction('\U0001F615');
-            await ctx.send("Volume must be between 0 and 200.")
+            await ctx.send("Need a level between 0 and 200.")
         elif isinstance(err, commands.errors.MissingRequiredArgument):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send("No volume specified.")
+
+    @commands.command(aliases=['yt'])
+    async def youtube(self, ctx, *url):
+        """
+        Plays YouTube video from URL.
+
+        Joins author's voice channel if not in one.
+        Interrupts current sound if necessary.
+        """
+        YDL_OPTS = {'format': 'bestaudio', 'noplaylist': 'True'}
+        FFMPEG_OPTS = {'before_options': '-reconnect 1 -reconnect_streamed 1 '
+                       '-reconnect_delay_max 5',
+                       'options': '-vn'}
+
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+        with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
+            info = (ydl.extract_info(f'ytsearch:{url}', download=False)
+                    ['entries'][0])
+        
+        if not voice:
+            await self.join(ctx)
+
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+        
+        if voice:
+            if voice.is_playing():
+                voice.stop()
+        
+        URL = info['formats'][0]['url']
+        title = info['title']
+        voice.play(discord.FFmpegPCMAudio(executable=os.environ['FFMPEG_PATH'],
+                                          source=URL, **FFMPEG_OPTS))
+        
+        await ctx.send(f"Playing `{title}`.")
+
+    @youtube.error
+    async def yt_err(self, ctx, err):
+        if isinstance(err, commands.errors.MissingRequiredArgument):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"No URL provided.")
+        elif isinstance(err, youtube_dl.utils.DownloadError):
+            await ctx.message.add_reaction('\U0001F615');
+            await ctx.send(f"Invalid YouTube URL.")
     
     async def cog_check(self, ctx):
         return bool(ctx.guild)
