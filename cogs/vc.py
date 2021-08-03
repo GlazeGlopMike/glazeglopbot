@@ -104,10 +104,11 @@ class VC(commands.Cog):
         audio = discord.FFmpegPCMAudio(executable=ffmpeg_path,
                                        source=sound_path, **ffmpeg_opts)
         sound = discord.PCMVolumeTransformer(audio)
-        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
         
         if not voice:
             await self.join(ctx)
+
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
         if voice:
             if voice.is_playing():
@@ -165,9 +166,10 @@ class VC(commands.Cog):
             await ctx.send("No volume specified.")
 
     @commands.command(aliases=['yt'])
-    async def youtube(self, ctx, *url):
+    async def youtube(self, ctx, *search):
         """
-        Plays YouTube video from URL.
+        Plays YouTube video.
+        Takes first result from YouTube search if valid URL not detected.
 
         Joins author's voice channel if not in one.
         Interrupts current sound if necessary.
@@ -179,16 +181,29 @@ class VC(commands.Cog):
             await ctx.send("Not in a voice channel.")
             return
         
-        YDL_OPTS = {'format': 'bestaudio', 'noplaylist': 'True'}
+        YDL_OPTS = {'default_search': 'auto', 'format': 'bestaudio',
+                    'noplaylist': 'True'}
         FFMPEG_OPTS = {'before_options': '-reconnect 1 -reconnect_streamed 1 '
                        '-reconnect_delay_max 5',
                        'options': '-vn'}
         
         with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
-            info = (ydl.extract_info(f'ytsearch:{url}', download=False)
-                    ['entries'][0])
+            try:
+                info = ydl.extract_info(' '.join(search), download=False)
+            except youtube_dl.utils.DownloadError:
+                await ctx.message.add_reaction('\U0001F615');
+                await ctx.send(f"Couldn't stream that sound.")
+                return
+
+        if 'entries' in info:
+            if info['entries']:
+                info = info['entries'][0]
+            else:
+                await ctx.send(f"No results found for `{search}`.")
+                return
         
         if not voice:
+            await ctx.message.add_reaction('\U0001F615')
             await self.join(ctx)
 
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
@@ -209,9 +224,6 @@ class VC(commands.Cog):
         if isinstance(err, commands.errors.MissingRequiredArgument):
             await ctx.message.add_reaction('\U0001F615');
             await ctx.send(f"No URL provided.")
-        elif isinstance(err, youtube_dl.utils.DownloadError):
-            await ctx.message.add_reaction('\U0001F615');
-            await ctx.send(f"Couldn't download the video.")
     
     async def cog_check(self, ctx):
         return bool(ctx.guild)
@@ -224,8 +236,6 @@ class VC(commands.Cog):
                 and isinstance(err.original, discord.errors.ClientException)):
             await ctx.message.add_reaction('\U0001F916')
             await ctx.send("Couldn't play sound due to missing dependency.")
-        else:
-            print(err)
 
 def setup(bot):
     bot.add_cog(VC(bot))
